@@ -131,7 +131,7 @@ export function LoginPage() {
 
         {/* Benefits Section */}
         <div className="mt-8 space-y-3">
-          <h3 className="text-sm font-semibold text-foreground">Why join FarmShare?</h3>
+          <h3 className="text-sm font-semibold text-foreground">Why join Hasiru?</h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li className="flex items-start gap-2">
               <span className="text-primary font-bold">✓</span>

@@ -10,6 +10,7 @@ export interface Equipment {
   brand?: string;
   model_number?: string;
   type?: string;
+  chc_id: number; // Associated CHC center ID
 }
 
 export const EQUIPMENT_LIST: Equipment[] = [
@@ -22,7 +23,8 @@ export const EQUIPMENT_LIST: Equipment[] = [
     available: true,
     category: "Tractor",
     brand: "Mahindra",
-    model_number: "575DI"
+    model_number: "575DI",
+    chc_id: 14 // GKVK
   },
   {
     id: 102,
@@ -33,7 +35,8 @@ export const EQUIPMENT_LIST: Equipment[] = [
     available: true,
     category: "Tractor",
     brand: "John Deere",
-    model_number: "5105"
+    model_number: "5105",
+    chc_id: 15 // Uddurkaval
   },
   {
     id: 103,
@@ -44,7 +47,8 @@ export const EQUIPMENT_LIST: Equipment[] = [
     available: true,
     category: "Tractor",
     brand: "Swaraj",
-    model_number: "744FE"
+    model_number: "744FE",
+    chc_id: 16 // Doddaballapura
   },
   {
     id: 201,
@@ -56,7 +60,8 @@ export const EQUIPMENT_LIST: Equipment[] = [
     category: "Harvester",
     brand: "Claas",
     model_number: "Crop Tiger 30 Terra Trac",
-    type: "Multi-crop combine harvester"
+    type: "Multi-crop combine harvester",
+    chc_id: 20 // Dalasanuru
   },
   {
     id: 202,
@@ -68,7 +73,8 @@ export const EQUIPMENT_LIST: Equipment[] = [
     category: "Harvester",
     brand: "Kubota",
     model_number: "DC-68G-HK",
-    type: "Paddy combine harvester"
+    type: "Paddy combine harvester",
+    chc_id: 14 // GKVK
   },
   {
     id: 301,
@@ -80,7 +86,8 @@ export const EQUIPMENT_LIST: Equipment[] = [
     category: "Seed Drill",
     brand: "Fieldking",
     model_number: "FKSD-9",
-    type: "Seed Drill"
+    type: "Seed Drill",
+    chc_id: 15 // Uddurkaval
   },
   {
     id: 302,
@@ -92,7 +99,8 @@ export const EQUIPMENT_LIST: Equipment[] = [
     category: "Seed Drill",
     brand: "Fieldking",
     model_number: "FKMSD-13",
-    type: "Multi Crop Seed Drill"
+    type: "Multi Crop Seed Drill",
+    chc_id: 16 // Doddaballapura
   },
   {
     id: 401,
@@ -104,7 +112,8 @@ export const EQUIPMENT_LIST: Equipment[] = [
     category: "Rotavator",
     brand: "Fieldking",
     model_number: "FKRTMG-145",
-    type: "Rotary Tiller"
+    type: "Rotary Tiller",
+    chc_id: 20 // Dalasanuru
   },
   {
     id: 402,
@@ -116,6 +125,46 @@ export const EQUIPMENT_LIST: Equipment[] = [
     category: "Rotavator",
     brand: "Fieldking",
     model_number: "FKRTMG-175",
-    type: "Heavy Duty Rotavator"
+    type: "Heavy Duty Rotavator",
+    chc_id: 14 // GKVK
   }
 ];
+
+// Local storage key
+const USER_EQUIPMENT_KEY = "user_listed_equipment";
+
+// Save a new piece of equipment to local storage
+export function saveUserEquipment(equipment: Omit<Equipment, "id" | "available" | "distance">): void {
+  const existing = getUserEquipment();
+  const newId = 5000 + existing.length + Math.floor(Math.random() * 1000);
+  
+  const newEquipment: Equipment = {
+    ...equipment,
+    id: newId,
+    available: true,
+    distance: "Your Location"
+  };
+  
+  localStorage.setItem(USER_EQUIPMENT_KEY, JSON.stringify([...existing, newEquipment]));
+}
+
+// Get equipment from local storage
+export function getUserEquipment(chcId?: number): Equipment[] {
+  const data = localStorage.getItem(USER_EQUIPMENT_KEY);
+  if (!data) return [];
+  try {
+    const equipment: Equipment[] = JSON.parse(data);
+    return chcId ? equipment.filter(e => e.chc_id === chcId) : equipment;
+  } catch (e) {
+    console.error("Error parsing user equipment from localStorage", e);
+    return [];
+  }
+}
+
+// Get all equipment (merged and filtered by CHC)
+export function getAllEquipment(chcId?: number): Equipment[] {
+  const masterList = chcId 
+    ? EQUIPMENT_LIST.filter(e => e.chc_id === chcId)
+    : EQUIPMENT_LIST;
+  return [...getUserEquipment(chcId), ...masterList];
+}

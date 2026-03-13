@@ -1,11 +1,17 @@
 import { useState } from "react";
-import { Upload, X, MapPin, IndianRupee } from "lucide-react";
+import { useNavigate } from "react-router";
+import { Upload, X, MapPin, IndianRupee, Store, CheckCircle2 } from "lucide-react";
+import { CHC_CENTERS } from "../utils/auth";
+import { saveUserEquipment } from "../utils/equipmentData";
 
 export function ListEquipmentPage() {
+  const navigate = useNavigate();
   const [images, setImages] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     type: "",
+    chc: "",
     location: "",
     price: "",
     description: ""
@@ -25,8 +31,24 @@ export function ListEquipmentPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", { ...formData, images });
-    alert("Equipment listed successfully!");
+    setIsSubmitting(true);
+    
+    // Simulate save to local storage
+    saveUserEquipment({
+      name: formData.name,
+      image: images[0] || "https://images.unsplash.com/photo-1592982537447-7440770cbdi?fit=crop&q=80&w=800",
+      category: formData.type.charAt(0).toUpperCase() + formData.type.slice(1),
+      price: `₹${formData.price}`,
+      brand: "User Listed",
+      model_number: "N/A",
+      type: formData.description.slice(0, 30),
+      chc_id: parseInt(formData.chc) // Pass the selected CHC ID
+    });
+
+    setTimeout(() => {
+      setIsSubmitting(false);
+      navigate("/discover");
+    }, 1000);
   };
 
   return (
@@ -71,6 +93,30 @@ export function ListEquipmentPage() {
             </div>
           </div>
 
+          {/* Target CHC Section */}
+          <div className="bg-card rounded-2xl p-6 space-y-6 border-2 border-primary/20 bg-primary/5">
+            <h2 className="text-xl font-semibold flex items-center gap-2">
+              <Store className="w-6 h-6 text-primary" />
+              Target CHC Hub
+            </h2>
+            <p className="text-sm text-muted-foreground">Select the CHC center where you will deposit this equipment for rental</p>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Select CHC Center *</label>
+              <select
+                required
+                value={formData.chc}
+                onChange={(e) => setFormData({ ...formData, chc: e.target.value })}
+                className="w-full px-4 py-3 bg-input-background rounded-xl border border-primary/30 focus:ring-2 focus:ring-primary outline-none"
+              >
+                <option value="">Select a center</option>
+                {CHC_CENTERS.map(chc => (
+                  <option key={chc.id} value={chc.id}>CHC – {chc.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           {/* Equipment Details */}
           <div className="bg-card rounded-2xl p-6 space-y-6">
             <h2 className="text-xl font-semibold">Equipment Details</h2>
@@ -106,7 +152,7 @@ export function ListEquipmentPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Location *</label>
+              <label className="block text-sm font-medium mb-2">Your Location *</label>
               <div className="relative">
                 <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
@@ -147,31 +193,25 @@ export function ListEquipmentPage() {
             </div>
           </div>
 
-          {/* Availability */}
-          <div className="bg-card rounded-2xl p-6">
-            <h2 className="text-xl font-semibold mb-4">Availability</h2>
-            <p className="text-sm text-muted-foreground mb-4">Set when your equipment is available for rent</p>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
-                <label key={day} className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" className="w-4 h-4 rounded text-primary focus:ring-primary" />
-                  <span className="text-sm">{day}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
           {/* Submit */}
           <div className="flex gap-4">
             <button
               type="submit"
-              className="flex-1 bg-primary text-primary-foreground py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity"
+              disabled={isSubmitting}
+              className="flex-1 bg-primary text-primary-foreground py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              List Equipment
+              {isSubmitting ? (
+                <>Listing Equipment...</>
+              ) : (
+                <>
+                  <CheckCircle2 className="w-5 h-5" />
+                  List Equipment
+                </>
+              )}
             </button>
             <button
               type="button"
+              onClick={() => navigate(-1)}
               className="px-8 py-4 bg-muted text-foreground rounded-xl font-semibold hover:bg-muted/80 transition-colors"
             >
               Cancel

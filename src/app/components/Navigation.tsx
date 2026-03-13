@@ -33,7 +33,7 @@ export function Navigation() {
             <span className={`text-xl font-semibold ${
               isHome ? "text-white" : "text-foreground"
             }`}>
-              FarmShare
+              Hasiru
             </span>
           </Link>
 

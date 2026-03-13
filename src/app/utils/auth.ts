@@ -67,7 +67,13 @@ export function hasCompletedSetup(): boolean {
 // Get selected CHC
 export function getSelectedCHC(): SelectedCHC | null {
   const chc = localStorage.getItem("selectedCHC");
-  return chc ? JSON.parse(chc) : null;
+  if (!chc) return null;
+  try {
+    return JSON.parse(chc);
+  } catch (e) {
+    console.error("Error parsing selectedCHC from localStorage", e);
+    return null;
+  }
 }
 
 // Get user location

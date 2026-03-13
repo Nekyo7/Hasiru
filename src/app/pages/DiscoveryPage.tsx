@@ -3,23 +3,24 @@ import { Link, useNavigate } from "react-router";
 import { MapPin, Filter, Search, Tractor, ArrowLeft, Loader2 } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { getSelectedCHC } from "../utils/auth";
-import { EQUIPMENT_LIST } from "../utils/equipmentData";
+import { getAllEquipment } from "../utils/equipmentData";
 
 export function DiscoveryPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEquipment, setSelectedEquipment] = useState<number | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<string>("");
-  const [equipmentList] = useState<any[]>(EQUIPMENT_LIST);
+  const [equipmentList, setEquipmentList] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Supabase fetch removed - using hardware constants
-    
     // Get user's selected CHC from auth utilities
     const selectedCHC = getSelectedCHC();
     if (selectedCHC) {
       setSelectedLocation(selectedCHC.name);
+      setEquipmentList(getAllEquipment(selectedCHC.id));
+    } else {
+      setEquipmentList(getAllEquipment());
     }
   }, []);
 

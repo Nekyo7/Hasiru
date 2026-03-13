@@ -109,7 +109,7 @@ export function SignUpPage() {
         <div className="bg-card rounded-2xl shadow-lg p-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">Join FarmShare</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Join Hasiru</h1>
             <p className="text-muted-foreground">Start renting equipment from your nearest CHC</p>
           </div>
 

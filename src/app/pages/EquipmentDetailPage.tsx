@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router";
 import { MapPin, Star, Shield, Calendar, ArrowLeft, User, Loader2 } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { Calendar as CalendarComponent } from "../components/ui/calendar";
-import { EQUIPMENT_LIST } from "../utils/equipmentData";
+import { getAllEquipment } from "../utils/equipmentData";
 
 export function EquipmentDetailPage() {
   const { id } = useParams();
@@ -14,7 +14,7 @@ export function EquipmentDetailPage() {
 
   useEffect(() => {
     if (!id) return;
-    const found = EQUIPMENT_LIST.find(e => e.id === parseInt(id));
+    const found = getAllEquipment().find(e => e.id === parseInt(id));
     if (found) {
       setEquipment(found);
     }
