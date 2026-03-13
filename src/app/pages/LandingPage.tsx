@@ -85,17 +85,17 @@ export function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/discover"
+              to="/signup"
               className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-xl text-lg hover:scale-105 transition-transform shadow-lg"
             >
-              <span>Find Equipment</span>
+              <span>Get Started</span>
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
-              to="/list-equipment"
+              to="/chc-centers"
               className="inline-flex items-center justify-center gap-2 bg-secondary text-secondary-foreground px-8 py-4 rounded-xl text-lg hover:scale-105 transition-transform shadow-lg"
             >
-              <span>List Your Machine</span>
+              <span>Browse CHC Centers</span>
             </Link>
           </div>
         </div>
