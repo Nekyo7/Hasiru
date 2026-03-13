@@ -111,61 +111,59 @@ export function CHCSelectionPage() {
           <div className="lg:col-span-2">
             {filteredCenters.length > 0 ? (
               <div className="space-y-4">
-            {filteredCenters.map((center) => (
-              <button
-                key={center.id}
-                onClick={() => setSelectedId(center.id)}
-                className={`w-full text-left transition-all rounded-xl overflow-hidden border-2 ${
-                  selectedId === center.id
-                    ? "border-primary bg-primary/5 shadow-md"
-                    : "border-border bg-card hover:border-primary/50"
-                }`}
-              >
-                <div className="grid grid-cols-4 gap-0 h-full">
-                  {/* Image */}
-                  <div className="col-span-1 aspect-square overflow-hidden">
-                    <ImageWithFallback
-                      src={center.image}
-                      alt={center.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  {/* Content */}
-                  <div className="col-span-3 p-4 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-start justify-between mb-2">
-                        <h3 className="text-lg font-bold text-foreground">{center.name}</h3>
-                        {selectedId === center.id && (
-                          <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                        )}
+                {filteredCenters.map((center) => (
+                  <button
+                    key={center.id}
+                    onClick={() => setSelectedId(center.id)}
+                    className={`w-full text-left transition-all rounded-xl overflow-hidden border-2 ${
+                      selectedId === center.id
+                        ? "border-primary bg-primary/5 shadow-md"
+                        : "border-border bg-card hover:border-primary/50"
+                    }`}
+                  >
+                    <div className="grid grid-cols-4 gap-0 h-full">
+                      {/* Image */}
+                      <div className="col-span-1 aspect-square overflow-hidden">
+                        <ImageWithFallback
+                          src={center.image}
+                          alt={center.name}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                      <p className="text-sm text-muted-foreground mb-3">{center.address}</p>
-                    </div>
 
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Users className="w-4 h-4" />
-                          {center.equipment}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-4 h-4" />
-                          {center.distance}
-                        </span>
+                      {/* Content */}
+                      <div className="col-span-3 p-4 flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-start justify-between mb-2">
+                            <h3 className="text-lg font-bold text-foreground">{center.name}</h3>
+                            {selectedId === center.id && (
+                              <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-3">{center.address}</p>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Users className="w-4 h-4" />
+                              {center.equipment}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <MapPin className="w-4 h-4" />
+                              {center.distance}
+                            </span>
+                          </div>
+                          <ArrowRight
+                            className={`w-4 h-4 transition-transform ${
+                              selectedId === center.id ? "text-primary translate-x-1" : "text-muted-foreground"
+                            }`}
+                          />
+                        </div>
                       </div>
-                      <ArrowRight
-                        className={`w-4 h-4 transition-transform ${
-                          selectedId === center.id ? "text-primary translate-x-1" : "text-muted-foreground"
-                        }`}
-                      />
                     </div>
-                  </div>
-                </div>
-              </button>
+                  </button>
                 ))}
-              </button>
-            ))}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -182,31 +180,38 @@ export function CHCSelectionPage() {
               </div>
             )}
           </div>
-                  </div>
 
-                  <div className="flex items-start gap-3">
-                    <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-xs text-muted-foreground uppercase">Location</p>
-                      <p className="font-semibold text-foreground text-sm">{selectedCenter.address}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{selectedCenter.distance}</p>
-                    </div>
-                  </div>
+          {/* Detail Panel */}
+          <div className="lg:col-span-1">
+            {selectedCenter ? (
+              <div className="sticky top-24 bg-card rounded-2xl p-6 shadow-sm border border-border space-y-6">
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Selected Center</p>
+                  <h2 className="text-2xl font-bold text-foreground">{selectedCenter.name}</h2>
+                </div>
 
-                  <div className="flex items-start gap-3">
-                    <Phone className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-xs text-muted-foreground uppercase">Contact</p>
-                      <p className="font-semibold text-foreground">{selectedCenter.phone}</p>
-                    </div>
+                <div className="flex items-start gap-3">
+                  <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs text-muted-foreground uppercase">Location</p>
+                    <p className="font-semibold text-foreground text-sm">{selectedCenter.address}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{selectedCenter.distance}</p>
                   </div>
+                </div>
 
-                  <div className="flex items-start gap-3">
-                    <Clock className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-xs text-muted-foreground uppercase">Hours</p>
-                      <p className="font-semibold text-foreground">6:00 AM - 6:00 PM</p>
-                    </div>
+                <div className="flex items-start gap-3">
+                  <Phone className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs text-muted-foreground uppercase">Contact</p>
+                    <p className="font-semibold text-foreground">{selectedCenter.phone}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Clock className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs text-muted-foreground uppercase">Hours</p>
+                    <p className="font-semibold text-foreground">6:00 AM - 6:00 PM</p>
                   </div>
                 </div>
 
@@ -218,7 +223,7 @@ export function CHCSelectionPage() {
                   <ArrowRight className="w-4 h-4" />
                 </button>
 
-                <p className="text-xs text-muted-foreground text-center mt-4">
+                <p className="text-xs text-muted-foreground text-center">
                   You can change your CHC center anytime in your profile settings.
                 </p>
               </div>
