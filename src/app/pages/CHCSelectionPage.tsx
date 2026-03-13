@@ -1,32 +1,18 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { MapPin, Users, Phone, Clock, ArrowRight, CheckCircle, Search, Loader2, ExternalLink } from "lucide-react";
-import { selectCHC } from "../utils/auth";
+import { selectCHC, CHC_CENTERS } from "../utils/auth";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
-import { supabase } from "../../lib/supabase";
 
 export function CHCSelectionPage() {
   const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [centers, setCenters] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [centers] = useState<any[]>(CHC_CENTERS);
+  const [isLoading] = useState(false);
 
   useEffect(() => {
-    const fetchCenters = async () => {
-      try {
-        const { data, error } = await supabase.from('chc_centers').select('*');
-        if (error) {
-          console.error("Error fetching CHC Centers:", error);
-        } else {
-          setCenters(data || []);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCenters();
+    // Supabase fetch removed - using hardcoded centers
   }, []);
 
   const filteredCenters = useMemo(() => {

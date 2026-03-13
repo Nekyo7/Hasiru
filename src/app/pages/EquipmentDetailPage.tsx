@@ -3,37 +3,21 @@ import { useParams, Link } from "react-router";
 import { MapPin, Star, Shield, Calendar, ArrowLeft, User, Loader2 } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { Calendar as CalendarComponent } from "../components/ui/calendar";
-import { supabase } from "../../lib/supabase";
+import { EQUIPMENT_LIST } from "../utils/equipmentData";
 
 export function EquipmentDetailPage() {
   const { id } = useParams();
   const [selectedImage, setSelectedImage] = useState(0);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [equipment, setEquipment] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const fetchEquipment = async () => {
-      if (!id) return;
-      
-      try {
-        const { data, error } = await supabase
-          .from('equipment')
-          .select('*')
-          .eq('id', id)
-          .single();
-          
-        if (error) {
-          console.error("Error fetching equipment details:", error);
-        } else {
-          setEquipment(data);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchEquipment();
+    if (!id) return;
+    const found = EQUIPMENT_LIST.find(e => e.id === parseInt(id));
+    if (found) {
+      setEquipment(found);
+    }
   }, [id]);
 
   if (isLoading) {

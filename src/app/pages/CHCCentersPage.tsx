@@ -2,28 +2,15 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { MapPin, Users, Clock, Phone, ArrowRight, Loader2, ExternalLink } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
-import { supabase } from "../../lib/supabase";
+import { CHC_CENTERS } from "../utils/auth";
 
 export function CHCCentersPage() {
   const navigate = useNavigate();
-  const [centers, setCenters] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [centers] = useState<any[]>(CHC_CENTERS);
+  const [isLoading] = useState(false);
 
   useEffect(() => {
-    const fetchCenters = async () => {
-      try {
-        const { data, error } = await supabase.from('chc_centers').select('*');
-        if (error) {
-          console.error("Error fetching CHC Centers:", error);
-        } else {
-          setCenters(data || []);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCenters();
+    // Supabase fetch removed - using hardcoded centers
   }, []);
 
   const handleSelectCHC = (location: string) => {

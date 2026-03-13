@@ -5,11 +5,10 @@ import { selectCHC } from "../utils/auth";
 import { supabase } from "../../lib/supabase";
 
 const CHC_LOCATIONS = [
+  "gkvk",
+  "Uddurkaval",
   "Doddaballapura",
-  "Devanahalli",
-  "Hoskote",
-  "Nelamangala",
-  "Anekal"
+  "Dalasanuru"
 ];
 
 export function SignUpPage() {
