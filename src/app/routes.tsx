@@ -8,6 +8,8 @@ import { EquipmentDetailPage } from "./pages/EquipmentDetailPage";
 import { ListEquipmentPage } from "./pages/ListEquipmentPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { MapViewPage } from "./pages/MapViewPage";
+import { LoginPage } from "./pages/LoginPage";
+import { CHCSelectionPage } from "./pages/CHCSelectionPage";
 
 export const router = createBrowserRouter([
   {
@@ -15,6 +17,8 @@ export const router = createBrowserRouter([
     Component: Root,
     children: [
       { index: true, Component: LandingPage },
+      { path: "login", Component: LoginPage },
+      { path: "chc-selection", Component: CHCSelectionPage },
       { path: "signup", Component: SignUpPage },
       { path: "chc-centers", Component: CHCCentersPage },
       { path: "discover", Component: DiscoveryPage },
