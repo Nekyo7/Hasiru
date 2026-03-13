@@ -10,7 +10,7 @@ export function Root() {
   useEffect(() => {
     // Check if user needs to complete setup flow
     // Skip redirect on setup pages and landing page
-    const setupPages = ["/login", "/location-setup", "/chc-selection", "/"];
+    const setupPages = ["/login", "/chc-selection", "/"];
     const isOnSetupPage = setupPages.includes(location.pathname);
 
     if (!isOnSetupPage) {

@@ -9,7 +9,6 @@ import { ListEquipmentPage } from "./pages/ListEquipmentPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { MapViewPage } from "./pages/MapViewPage";
 import { LoginPage } from "./pages/LoginPage";
-import { LocationSetupPage } from "./pages/LocationSetupPage";
 import { CHCSelectionPage } from "./pages/CHCSelectionPage";
 
 export const router = createBrowserRouter([
@@ -19,7 +18,6 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: LandingPage },
       { path: "login", Component: LoginPage },
-      { path: "location-setup", Component: LocationSetupPage },
       { path: "chc-selection", Component: CHCSelectionPage },
       { path: "signup", Component: SignUpPage },
       { path: "chc-centers", Component: CHCCentersPage },

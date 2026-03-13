@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
-import { MapPin, Users, Phone, Clock, ArrowRight, CheckCircle } from "lucide-react";
-import { selectCHC, getUserLocation } from "../utils/auth";
+import { MapPin, Users, Phone, Clock, ArrowRight, CheckCircle, Search } from "lucide-react";
+import { selectCHC } from "../utils/auth";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 
 const CHC_CENTERS = [
@@ -55,7 +55,20 @@ const CHC_CENTERS = [
 export function CHCSelectionPage() {
   const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const userLocation = getUserLocation();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredCenters = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return CHC_CENTERS;
+    }
+    const query = searchQuery.toLowerCase();
+    return CHC_CENTERS.filter(
+      (center) =>
+        center.name.toLowerCase().includes(query) ||
+        center.address.toLowerCase().includes(query) ||
+        center.phone.includes(query)
+    );
+  }, [searchQuery]);
 
   const selectedCenter = CHC_CENTERS.find((c) => c.id === selectedId);
 
@@ -76,17 +89,29 @@ export function CHCSelectionPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Select Your CHC Center</h1>
-          <p className="text-muted-foreground">
-            {userLocation
-              ? `Showing centers in and near ${userLocation}`
-              : "Select the CHC center you want to work with"}
+          <p className="text-muted-foreground mb-6">
+            Find and select the CHC center near you to browse available equipment
           </p>
+          
+          {/* Search Bar */}
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search by center name, location, or phone number..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 bg-card border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            />
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* CHC List */}
-          <div className="lg:col-span-2 space-y-4">
-            {CHC_CENTERS.map((center) => (
+          <div className="lg:col-span-2">
+            {filteredCenters.length > 0 ? (
+              <div className="space-y-4">
+            {filteredCenters.map((center) => (
               <button
                 key={center.id}
                 onClick={() => setSelectedId(center.id)}
@@ -138,24 +163,25 @@ export function CHCSelectionPage() {
                   </div>
                 </div>
               </button>
+                ))}
+              </button>
             ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <MapPin className="w-12 h-12 text-muted-foreground/30 mb-3" />
+                <p className="text-muted-foreground">
+                  No CHC centers found matching "{searchQuery}"
+                </p>
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="text-primary hover:underline text-sm mt-2"
+                >
+                  Clear search
+                </button>
+              </div>
+            )}
           </div>
-
-          {/* Detail Panel */}
-          <div>
-            {selectedCenter ? (
-              <div className="sticky top-24 bg-card rounded-2xl p-6 shadow-sm border border-border">
-                <h3 className="text-xl font-bold text-foreground mb-6">
-                  CHC – {selectedCenter.name}
-                </h3>
-
-                <div className="space-y-5 mb-6">
-                  <div className="flex items-start gap-3">
-                    <Users className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-xs text-muted-foreground uppercase">Equipment</p>
-                      <p className="font-semibold text-foreground">{selectedCenter.equipment}</p>
-                    </div>
                   </div>
 
                   <div className="flex items-start gap-3">

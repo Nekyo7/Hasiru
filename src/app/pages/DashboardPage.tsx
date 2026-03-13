@@ -125,68 +125,101 @@ export function DashboardPage() {
             </div>
 
             <div className="bg-card rounded-2xl p-6">
-              <h2 className="text-2xl font-semibold mb-6">Upcoming Rentals</h2>
-              <div className="space-y-3">
-                {upcomingRentals.map((rental) => (
-                  <div key={rental.id} className="flex items-center justify-between p-4 border border-border rounded-xl hover:border-primary transition-colors">
-                    <div>
-                      <h3 className="font-semibold">{rental.equipment}</h3>
-                      <p className="text-sm text-muted-foreground">Rented to {rental.renter}</p>
-                      <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          {rental.date}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {rental.duration}
-                        </span>
+              <h2 className="text-2xl font-semibold mb-6">My Bookings</h2>
+              
+              {/* Requested Bookings */}
+              {bookingRequests.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-foreground mb-4 pb-3 border-b border-border">Booking Requests</h3>
+                  <div className="space-y-4">
+                    {bookingRequests.map((request) => (
+                      <div key={request.id} className="border border-border rounded-xl p-4 hover:border-secondary transition-colors">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+                            <ImageWithFallback
+                              src={request.image}
+                              alt={request.requester}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold">{request.requester}</h3>
+                            <p className="text-xs text-muted-foreground">requesting</p>
+                          </div>
+                        </div>
+                        <p className="font-medium text-sm mb-1">{request.equipment}</p>
+                        <div className="text-xs text-muted-foreground mb-4">
+                          <p>{request.date}</p>
+                          <p>{request.duration}</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <button className="flex-1 bg-primary text-primary-foreground py-2 rounded-lg text-sm hover:opacity-90 transition-opacity">
+                            Accept
+                          </button>
+                          <button className="flex-1 bg-muted text-foreground py-2 rounded-lg text-sm hover:bg-muted/80 transition-colors">
+                            Decline
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-lg">{rental.amount}</p>
-                    </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+              )}
+
+              {/* Upcoming Rentals */}
+              <div>
+                <h3 className="text-lg font-semibold text-foreground mb-4 pb-3 border-b border-border">Upcoming Rentals</h3>
+                <div className="space-y-3">
+                  {upcomingRentals.length > 0 ? (
+                    upcomingRentals.map((rental) => (
+                      <div key={rental.id} className="flex items-center justify-between p-4 border border-border rounded-xl hover:border-primary transition-colors">
+                        <div>
+                          <h3 className="font-semibold">{rental.equipment}</h3>
+                          <p className="text-sm text-muted-foreground">Rented to {rental.renter}</p>
+                          <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              {rental.date}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {rental.duration}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-lg">{rental.amount}</p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-muted-foreground text-sm py-4">No upcoming rentals</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Booking Requests */}
+          {/* Summary Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-card rounded-2xl p-6 sticky top-24">
-              <h2 className="text-2xl font-semibold mb-6">Booking Requests</h2>
-              <div className="space-y-4">
-                {bookingRequests.map((request) => (
-                  <div key={request.id} className="border border-border rounded-xl p-4 hover:border-secondary transition-colors">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-12 h-12 rounded-full overflow-hidden">
-                        <ImageWithFallback
-                          src={request.image}
-                          alt={request.requester}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold">{request.requester}</h3>
-                        <p className="text-xs text-muted-foreground">wants to rent</p>
-                      </div>
-                    </div>
-                    <p className="font-medium text-sm mb-1">{request.equipment}</p>
-                    <div className="text-xs text-muted-foreground mb-4">
-                      <p>{request.date}</p>
-                      <p>{request.duration}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button className="flex-1 bg-primary text-primary-foreground py-2 rounded-lg text-sm hover:opacity-90 transition-opacity">
-                        Accept
-                      </button>
-                      <button className="flex-1 bg-muted text-foreground py-2 rounded-lg text-sm hover:bg-muted/80 transition-colors">
-                        Decline
-                      </button>
-                    </div>
-                  </div>
-                ))}
+              <h2 className="text-2xl font-semibold mb-6">Quick Stats</h2>
+              <div className="space-y-5">
+                <div className="border-b border-border pb-5">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Total Requests</p>
+                  <p className="text-3xl font-bold text-primary">{bookingRequests.length}</p>
+                  <p className="text-xs text-muted-foreground mt-1">Pending approval</p>
+                </div>
+                <div className="border-b border-border pb-5">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Upcoming</p>
+                  <p className="text-3xl font-bold text-secondary">{upcomingRentals.length}</p>
+                  <p className="text-xs text-muted-foreground mt-1">Active rentals</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Response Time</p>
+                  <p className="text-lg font-bold text-accent">2 hours</p>
+                  <p className="text-xs text-muted-foreground mt-1">Average</p>
+                </div>
               </div>
             </div>
           </div>

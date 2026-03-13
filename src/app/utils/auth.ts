@@ -92,14 +92,8 @@ export function getNextRoute(): string {
   if (!isAuthenticated()) {
     return "/login";
   }
-  if (!getUserLocation()) {
-    return "/location-setup";
-  }
   if (!getSelectedCHC()) {
     return "/chc-selection";
-  }
-  if (!hasCompletedSetup()) {
-    return "/location-setup";
   }
   return "/discover";
 }
