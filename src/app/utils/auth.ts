@@ -22,7 +22,7 @@ export const CHC_CENTERS: CHCCenter[] = [
     map_link: "https://maps.app.goo.gl/8NBNHyEzyCWnifh59",
     distance: "3 km away",
     phone: "080-23330153",
-    image: "https://images.unsplash.com/photo-1592982537447-7440770cbdi+Ramanagar"
+    image: "/images/gkvk_ch_centre.png"
   },
   {
     id: 15,
