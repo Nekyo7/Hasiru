@@ -1,7 +1,15 @@
-import { useState } from "react";
-import { Link } from "react-router";
-import { MapPin, Filter, Search, Tractor } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router";
+import { MapPin, Filter, Search, Tractor, ArrowLeft } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
+
+const CHC_LOCATIONS = [
+  "Doddaballapura",
+  "Devanahalli",
+  "Hoskote",
+  "Nelamangala",
+  "Anekal"
+];
 
 const equipmentData = [
   {
@@ -79,13 +87,52 @@ const equipmentData = [
 ];
 
 export function DiscoveryPage() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEquipment, setSelectedEquipment] = useState<number | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<string>("");
+
+  useEffect(() => {
+    // Get user's selected location from localStorage
+    const userLocation = localStorage.getItem("userLocation");
+    if (userLocation) {
+      setSelectedLocation(userLocation);
+    }
+  }, []);
+
+  const handleChangeLocation = (location: string) => {
+    localStorage.setItem("userLocation", location);
+    setSelectedLocation(location);
+  };
 
   return (
     <div className="min-h-screen pt-16">
+      {/* CHC Selection Header */}
+      {selectedLocation && (
+        <div className="bg-primary/10 border-b border-primary/20 sticky top-16 z-40">
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <MapPin className="w-5 h-5 text-primary" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Selected CHC</p>
+                  <p className="text-lg font-semibold text-foreground">CHC Center – {selectedLocation}</p>
+                </div>
+              </div>
+              <Link
+                to="/chc-centers"
+                className="flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors text-primary font-medium text-sm"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Change Center
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Search Header */}
-      <div className="bg-card border-b sticky top-16 z-40">
+      <div className="bg-card border-b sticky top-32 z-40">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <div className="flex-1 relative">
