@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { MapPin, Filter, Search, Tractor, ArrowLeft } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
+import { getSelectedCHC } from "../utils/auth";
 
 const CHC_LOCATIONS = [
   "Doddaballapura",
@@ -93,16 +94,16 @@ export function DiscoveryPage() {
   const [selectedLocation, setSelectedLocation] = useState<string>("");
 
   useEffect(() => {
-    // Get user's selected location from localStorage
-    const userLocation = localStorage.getItem("userLocation");
-    if (userLocation) {
-      setSelectedLocation(userLocation);
+    // Get user's selected CHC from auth utilities
+    const selectedCHC = getSelectedCHC();
+    if (selectedCHC) {
+      setSelectedLocation(selectedCHC.name);
     }
   }, []);
 
-  const handleChangeLocation = (location: string) => {
-    localStorage.setItem("userLocation", location);
-    setSelectedLocation(location);
+  const handleChangeLocation = () => {
+    // Navigate to CHC selection to change center
+    navigate("/chc-selection");
   };
 
   return (
@@ -119,13 +120,13 @@ export function DiscoveryPage() {
                   <p className="text-lg font-semibold text-foreground">CHC Center – {selectedLocation}</p>
                 </div>
               </div>
-              <Link
-                to="/chc-centers"
+              <button
+                onClick={handleChangeLocation}
                 className="flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors text-primary font-medium text-sm"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Change Center
-              </Link>
+              </button>
             </div>
           </div>
         </div>

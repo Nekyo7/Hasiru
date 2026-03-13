@@ -1,11 +1,21 @@
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { Tractor, Map, LayoutDashboard, Plus, Building2, BookOpen, User, LogOut } from "lucide-react";
 import { useState } from "react";
+import { getCurrentUser, logout, isAuthenticated } from "../utils/auth";
 
 export function Navigation() {
   const location = useLocation();
+  const navigate = useNavigate();
   const isHome = location.pathname === "/";
   const [showDropdown, setShowDropdown] = useState(false);
+  const currentUser = getCurrentUser();
+  const userIsAuthenticated = isAuthenticated();
+
+  const handleLogout = () => {
+    logout();
+    setShowDropdown(false);
+    navigate("/login", { replace: true });
+  };
 
   return (
     <nav className={`sticky top-0 z-50 transition-all ${
@@ -61,41 +71,64 @@ export function Navigation() {
             </Link>
 
             {/* Profile Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setShowDropdown(!showDropdown)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+            {userIsAuthenticated ? (
+              <div className="relative">
+                <button
+                  onClick={() => setShowDropdown(!showDropdown)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                    isHome 
+                      ? "text-white hover:bg-white/10" 
+                      : "text-foreground hover:bg-muted"
+                  }`}
+                >
+                  <User className="w-4 h-4" />
+                  <span className="hidden sm:inline text-sm truncate max-w-[100px]">
+                    {currentUser?.name || "Profile"}
+                  </span>
+                </button>
+                {showDropdown && (
+                  <div className="absolute right-0 mt-2 w-56 bg-card rounded-lg shadow-lg border border-border overflow-hidden z-10">
+                    {/* User Info */}
+                    <div className="px-4 py-3 bg-muted/50 border-b border-border">
+                      <p className="text-xs text-muted-foreground uppercase tracking-wide">Logged in as</p>
+                      <p className="font-semibold text-foreground text-sm truncate">{currentUser?.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{currentUser?.email}</p>
+                    </div>
+
+                    {/* Menu Items */}
+                    <Link
+                      to="/dashboard"
+                      className="flex items-center gap-2 px-4 py-3 hover:bg-muted transition-colors text-foreground text-sm"
+                      onClick={() => setShowDropdown(false)}
+                    >
+                      <LayoutDashboard className="w-4 h-4" />
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2 px-4 py-3 hover:bg-muted transition-colors text-foreground text-sm border-t border-border"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className={`px-3 py-2 rounded-lg transition-colors ${
                   isHome 
                     ? "text-white hover:bg-white/10" 
                     : "text-foreground hover:bg-muted"
                 }`}
               >
-                <User className="w-4 h-4" />
-                <span className="hidden sm:inline">Profile</span>
-              </button>
-              {showDropdown && (
-                <div className="absolute right-0 mt-2 w-48 bg-card rounded-lg shadow-lg border border-border overflow-hidden">
-                  <Link
-                    to="/dashboard"
-                    className="flex items-center gap-2 px-4 py-3 hover:bg-muted transition-colors text-foreground text-sm"
-                  >
-                    <LayoutDashboard className="w-4 h-4" />
-                    Dashboard
-                  </Link>
-                  <button
-                    onClick={() => {
-                      localStorage.removeItem("userInfo");
-                      localStorage.removeItem("userLocation");
-                      setShowDropdown(false);
-                    }}
-                    className="w-full flex items-center gap-2 px-4 py-3 hover:bg-muted transition-colors text-foreground text-sm border-t border-border"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
+                <span className="flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  <span className="hidden sm:inline">Sign In</span>
+                </span>
+              </Link>
+            )}
 
             <Link
               to="/list-equipment"
