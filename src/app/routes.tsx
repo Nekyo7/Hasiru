@@ -10,11 +10,13 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { MapViewPage } from "./pages/MapViewPage";
 import { LoginPage } from "./pages/LoginPage";
 import { CHCSelectionPage } from "./pages/CHCSelectionPage";
+import { ErrorPage } from "./pages/ErrorPage";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     Component: Root,
+    errorElement: <ErrorPage />,
     children: [
       { index: true, Component: LandingPage },
       { path: "login", Component: LoginPage },

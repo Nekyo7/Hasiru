@@ -1,76 +1,48 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { MapPin, Users, Phone, Clock, ArrowRight, CheckCircle, Search } from "lucide-react";
+import { MapPin, Users, Phone, Clock, ArrowRight, CheckCircle, Search, Loader2, ExternalLink } from "lucide-react";
 import { selectCHC } from "../utils/auth";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
-
-const CHC_CENTERS = [
-  {
-    id: 1,
-    name: "Doddaballapura",
-    equipment: "120+ equipment",
-    distance: "45 km from Bengaluru",
-    phone: "+91-80-2753-XXXX",
-    image: "https://images.unsplash.com/photo-1758636528604-a8b3d3824157?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZWQlMjB0cmFjdG9yJTIwd29ya2luZ3xlbnwxfHx8fDE3NzMzODkzMzh8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    address: "Doddaballapura Taluk, Bengaluru Rural District"
-  },
-  {
-    id: 2,
-    name: "Devanahalli",
-    equipment: "95+ equipment",
-    distance: "40 km from Bengaluru",
-    phone: "+91-80-2796-XXXX",
-    image: "https://images.unsplash.com/photo-1685335686020-e0b487f7f426?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxqb2huJTIwZGVlcmUlMjB0cmFjdG9yfGVufDF8fHx8MTc3MzM4OTM0MHww&ixlib=rb-4.1.0&q=80&w=1080",
-    address: "Devanahalli Taluk, Bengaluru Rural District"
-  },
-  {
-    id: 3,
-    name: "Hoskote",
-    equipment: "110+ equipment",
-    distance: "35 km from Bengaluru",
-    phone: "+91-80-2772-XXXX",
-    image: "https://images.unsplash.com/photo-1655818805647-585cb9c9b02a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYXJtJTIwbWFjaGluZXJ5JTIwZXF1aXBtZW50fGVufDF8fHx8MTc3MzMwODE0Nnww&ixlib=rb-4.1.0&q=80&w=1080",
-    address: "Hoskote Taluk, Bengaluru Rural District"
-  },
-  {
-    id: 4,
-    name: "Nelamangala",
-    equipment: "85+ equipment",
-    distance: "50 km from Bengaluru",
-    phone: "+91-80-2788-XXXX",
-    image: "https://images.unsplash.com/photo-1598370025936-0856434d26e7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpcnJpZ2F0aW9uJTIwc3lzdGVtJTIwZmFybXxlbnwxfHx8fDE3NzMzODkwNDV8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    address: "Nelamangala Taluk, Bengaluru Rural District"
-  },
-  {
-    id: 5,
-    name: "Anekal",
-    equipment: "100+ equipment",
-    distance: "55 km from Bengaluru",
-    phone: "+91-80-2741-XXXX",
-    image: "https://images.unsplash.com/photo-1764277434161-23d72931335f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzZWVkaW5nJTIwZXF1aXBtZW50JTIwYWdyaWN1bHR1cmV8ZW58MXx8fHwxNzczMzg5MzM5fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    address: "Anekal Taluk, Bengaluru Rural District"
-  }
-];
+import { supabase } from "../../lib/supabase";
 
 export function CHCSelectionPage() {
   const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [centers, setCenters] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCenters = async () => {
+      try {
+        const { data, error } = await supabase.from('chc_centers').select('*');
+        if (error) {
+          console.error("Error fetching CHC Centers:", error);
+        } else {
+          setCenters(data || []);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCenters();
+  }, []);
 
   const filteredCenters = useMemo(() => {
     if (!searchQuery.trim()) {
-      return CHC_CENTERS;
+      return centers;
     }
     const query = searchQuery.toLowerCase();
-    return CHC_CENTERS.filter(
+    return centers.filter(
       (center) =>
         center.name.toLowerCase().includes(query) ||
         center.address.toLowerCase().includes(query) ||
         center.phone.includes(query)
     );
-  }, [searchQuery]);
+  }, [searchQuery, centers]);
 
-  const selectedCenter = CHC_CENTERS.find((c) => c.id === selectedId);
+  const selectedCenter = centers.find((c) => c.id === selectedId);
 
   const handleConfirmSelection = () => {
     if (!selectedCenter) return;
@@ -82,6 +54,14 @@ export function CHCSelectionPage() {
 
     navigate("/discover");
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center pt-16 bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pt-16 bg-background">
@@ -146,10 +126,6 @@ export function CHCSelectionPage() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4 text-xs text-muted-foreground">
                             <span className="flex items-center gap-1">
-                              <Users className="w-4 h-4" />
-                              {center.equipment}
-                            </span>
-                            <span className="flex items-center gap-1">
                               <MapPin className="w-4 h-4" />
                               {center.distance}
                             </span>
@@ -195,7 +171,20 @@ export function CHCSelectionPage() {
                   <div>
                     <p className="text-xs text-muted-foreground uppercase">Location</p>
                     <p className="font-semibold text-foreground text-sm">{selectedCenter.address}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{selectedCenter.distance}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-muted-foreground">{selectedCenter.distance}</span>
+                      {selectedCenter.map_link && (
+                        <a
+                          href={selectedCenter.map_link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-primary hover:underline flex items-center gap-1"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          View on Map
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -211,7 +200,7 @@ export function CHCSelectionPage() {
                   <Clock className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-xs text-muted-foreground uppercase">Hours</p>
-                    <p className="font-semibold text-foreground">6:00 AM - 6:00 PM</p>
+                    <p className="font-semibold text-foreground">{selectedCenter.operating_hours || '6:00 AM - 6:00 PM'}</p>
                   </div>
                 </div>
 

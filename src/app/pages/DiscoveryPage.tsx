@@ -1,99 +1,34 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { MapPin, Filter, Search, Tractor, ArrowLeft } from "lucide-react";
+import { MapPin, Filter, Search, Tractor, ArrowLeft, Loader2 } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { getSelectedCHC } from "../utils/auth";
-
-const CHC_LOCATIONS = [
-  "Doddaballapura",
-  "Devanahalli",
-  "Hoskote",
-  "Nelamangala",
-  "Anekal"
-];
-
-const equipmentData = [
-  {
-    id: 1,
-    name: "Mahindra 475 DI Tractor",
-    distance: "3 km away",
-    price: "₹550",
-    available: true,
-    image: "https://images.unsplash.com/photo-1739066483931-b9d218fe50b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYWhpbmRyYSUyMHRyYWN0b3IlMjBpbmRpYXxlbnwxfHx8fDE3NzMzODkzNDB8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    location: { lat: 28.6139, lng: 77.2090 }
-  },
-  {
-    id: 2,
-    name: "John Deere 5055E",
-    distance: "5.2 km away",
-    price: "₹750",
-    available: true,
-    image: "https://images.unsplash.com/photo-1685335686020-e0b487f7f426?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxqb2huJTIwZGVlcmUlMjB0cmFjdG9yfGVufDF8fHx8MTc3MzM4OTM0MHww&ixlib=rb-4.1.0&q=80&w=1080",
-    location: { lat: 28.6239, lng: 77.2190 }
-  },
-  {
-    id: 3,
-    name: "Combine Harvester Pro",
-    distance: "8 km away",
-    price: "₹2,500",
-    available: true,
-    image: "https://images.unsplash.com/photo-1655818805647-585cb9c9b02a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYXJtJTIwbWFjaGluZXJ5JTIwZXF1aXBtZW50fGVufDF8fHx8MTc3MzMwODE0Nnww&ixlib=rb-4.1.0&q=80&w=1080",
-    location: { lat: 28.6339, lng: 77.2290 }
-  },
-  {
-    id: 4,
-    name: "Irrigation Pump System",
-    distance: "6.5 km away",
-    price: "₹350",
-    available: true,
-    image: "https://images.unsplash.com/photo-1598370025936-0856434d26e7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpcnJpZ2F0aW9uJTIwc3lzdGVtJTIwZmFybXxlbnwxfHx8fDE3NzMzODkwNDV8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    location: { lat: 28.6039, lng: 77.1990 }
-  },
-  {
-    id: 5,
-    name: "Seed Drill Planter",
-    distance: "4.8 km away",
-    price: "₹450",
-    available: false,
-    image: "https://images.unsplash.com/photo-1764277434161-23d72931335f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzZWVkaW5nJTIwZXF1aXBtZW50JTIwYWdyaWN1bHR1cmV8ZW58MXx8fHwxNzczMzg5MzM5fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    location: { lat: 28.6439, lng: 77.2390 }
-  },
-  {
-    id: 6,
-    name: "Farm Transport Truck",
-    distance: "10 km away",
-    price: "₹800",
-    available: true,
-    image: "https://images.unsplash.com/photo-1760765622766-0338e7c65d4d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYXJtJTIwdHJhbnNwb3J0JTIwdHJ1Y2t8ZW58MXx8fHwxNzczMzg5MzQwfDA&ixlib=rb-4.1.0&q=80&w=1080",
-    location: { lat: 28.5939, lng: 77.1890 }
-  },
-  {
-    id: 7,
-    name: "Heavy Duty Tractor",
-    distance: "7.2 km away",
-    price: "₹650",
-    available: true,
-    image: "https://images.unsplash.com/photo-1758636528604-a8b3d3824157?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZWQlMjB0cmFjdG9yJTIwd29ya2luZ3xlbnwxfHx8fDE3NzMzODkzMzh8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    location: { lat: 28.6539, lng: 77.2490 }
-  },
-  {
-    id: 8,
-    name: "Agricultural Sprayer",
-    distance: "5.5 km away",
-    price: "₹400",
-    available: true,
-    image: "https://images.unsplash.com/photo-1767615073776-a78f0bdf4006?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhZ3JpY3VsdHVyYWwlMjBlcXVpcG1lbnQlMjB3b3JrfGVufDF8fHx8MTc3MzM4OTM0MXww&ixlib=rb-4.1.0&q=80&w=1080",
-    location: { lat: 28.6139, lng: 77.1790 }
-  }
-];
+import { supabase } from "../../lib/supabase";
 
 export function DiscoveryPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEquipment, setSelectedEquipment] = useState<number | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<string>("");
+  const [equipmentList, setEquipmentList] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const fetchEquipment = async () => {
+      try {
+        const { data, error } = await supabase.from('equipment').select('*');
+        if (error) {
+          console.error("Error fetching equipment:", error);
+        } else {
+          setEquipmentList(data || []);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEquipment();
+
     // Get user's selected CHC from auth utilities
     const selectedCHC = getSelectedCHC();
     if (selectedCHC) {
@@ -105,6 +40,19 @@ export function DiscoveryPage() {
     // Navigate to CHC selection to change center
     navigate("/chc-selection");
   };
+
+  const filteredEquipment = equipmentList.filter(eq => 
+    eq.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    eq.category?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center pt-16">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pt-16">
@@ -158,7 +106,12 @@ export function DiscoveryPage() {
         {/* Equipment List */}
         <div className="w-full lg:w-1/2 overflow-y-auto px-4 py-6">
           <div className="max-w-2xl mx-auto space-y-4">
-            {equipmentData.map((equipment) => (
+            {filteredEquipment.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">
+                No equipment available at the moment.
+              </div>
+            ) : (
+              filteredEquipment.map((equipment) => (
               <Link
                 key={equipment.id}
                 to={`/equipment/${equipment.id}`}
@@ -199,7 +152,7 @@ export function DiscoveryPage() {
                   </div>
                 </div>
               </Link>
-            ))}
+            )))}
           </div>
         </div>
 
@@ -225,7 +178,7 @@ export function DiscoveryPage() {
             </div>
 
             {/* Marker Indicators */}
-            {equipmentData.slice(0, 5).map((equipment, index) => (
+            {filteredEquipment.slice(0, 5).map((equipment, index) => (
               <div
                 key={equipment.id}
                 className={`absolute bg-primary rounded-full p-2 cursor-pointer transition-all ${

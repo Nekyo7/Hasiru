@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { Mail, Phone, MapPin, User, ArrowRight } from "lucide-react";
+import { Mail, Phone, MapPin, User, ArrowRight, Loader2 } from "lucide-react";
+import { selectCHC } from "../utils/auth";
+import { supabase } from "../../lib/supabase";
 
 const CHC_LOCATIONS = [
   "Doddaballapura",
@@ -20,6 +22,7 @@ export function SignUpPage() {
     location: ""
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -63,14 +66,39 @@ export function SignUpPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (validateForm()) {
-      // Store user info in localStorage (state management)
-      localStorage.setItem("userInfo", JSON.stringify(formData));
-      localStorage.setItem("userLocation", formData.location);
+      setIsLoading(true);
+      setErrors({});
+
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.phone, // Using phone as a temporary password for simplicity in this demo, real world should have a password field
+        options: {
+          data: {
+            name: formData.name,
+            phone: formData.phone,
+            address: formData.address,
+          }
+        }
+      });
+
+      if (error) {
+        setErrors({ submit: error.message });
+        setIsLoading(false);
+        return;
+      }
+
+      // Find an ID for the selected location to map correctly 
+      // (a fake auto-increment ID is fine for demo as long as name matches)
+      selectCHC({
+        id: CHC_LOCATIONS.indexOf(formData.location) + 1,
+        name: formData.location
+      });
       
+      setIsLoading(false);
       // Redirect to CHC home page (DiscoveryPage)
       navigate("/discover");
     }
@@ -192,13 +220,29 @@ export function SignUpPage() {
               {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
             </div>
 
+            {errors.submit && (
+              <div className="bg-destructive/10 border border-destructive/20 text-destructive text-sm px-4 py-3 rounded-lg">
+                {errors.submit}
+              </div>
+            )}
+
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 mt-6"
+              disabled={isLoading}
+              className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
             >
-              <span>Create Account</span>
-              <ArrowRight className="w-4 h-4" />
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Creating Account...</span>
+                </>
+              ) : (
+                <>
+                  <span>Create Account</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
 
             {/* Already signed up */}
@@ -206,10 +250,10 @@ export function SignUpPage() {
               Already have an account?{" "}
               <button
                 type="button"
-                onClick={() => navigate("/discover")}
+                onClick={() => navigate("/login")}
                 className="text-primary hover:underline font-medium"
               >
-                Skip to discover
+                Sign in
               </button>
             </p>
           </form>

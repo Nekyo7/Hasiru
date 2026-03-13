@@ -1,25 +1,28 @@
 import { Link, useLocation, useNavigate } from "react-router";
 import { Tractor, Map, LayoutDashboard, Plus, Building2, BookOpen, User, LogOut } from "lucide-react";
 import { useState } from "react";
-import { getCurrentUser, logout, isAuthenticated } from "../utils/auth";
+import { useAuth } from "../contexts/AuthContext";
+import { clearSetupSession } from "../utils/auth";
 
 export function Navigation() {
   const location = useLocation();
   const navigate = useNavigate();
   const isHome = location.pathname === "/";
   const [showDropdown, setShowDropdown] = useState(false);
-  const currentUser = getCurrentUser();
-  const userIsAuthenticated = isAuthenticated();
+  
+  const { user, isAuthenticated, signOut } = useAuth();
+  const currentUser = user?.user_metadata || {};
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut();
+    clearSetupSession();
     setShowDropdown(false);
     navigate("/login", { replace: true });
   };
 
   return (
-    <nav className={`sticky top-0 z-50 transition-all ${
-      isHome ? "bg-transparent absolute w-full" : "bg-card shadow-sm"
+    <nav className={`top-0 z-50 transition-all w-full ${
+      isHome ? "bg-transparent absolute" : "bg-card shadow-sm sticky"
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -71,7 +74,7 @@ export function Navigation() {
             </Link>
 
             {/* Profile Dropdown */}
-            {userIsAuthenticated ? (
+            {isAuthenticated ? (
               <div className="relative">
                 <button
                   onClick={() => setShowDropdown(!showDropdown)}

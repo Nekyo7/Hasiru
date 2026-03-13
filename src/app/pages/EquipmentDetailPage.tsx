@@ -1,22 +1,70 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router";
-import { MapPin, Star, Shield, Calendar, ArrowLeft, User } from "lucide-react";
+import { MapPin, Star, Shield, Calendar, ArrowLeft, User, Loader2 } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { Calendar as CalendarComponent } from "../components/ui/calendar";
+import { supabase } from "../../lib/supabase";
 
-const equipmentDetails = {
-  1: {
-    name: "Mahindra 475 DI Tractor",
-    price: "₹550",
-    distance: "3 km away",
+export function EquipmentDetailPage() {
+  const { id } = useParams();
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [equipment, setEquipment] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEquipment = async () => {
+      if (!id) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('equipment')
+          .select('*')
+          .eq('id', id)
+          .single();
+          
+        if (error) {
+          console.error("Error fetching equipment details:", error);
+        } else {
+          setEquipment(data);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEquipment();
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center pt-16 bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!equipment) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center pt-16 bg-background">
+        <h2 className="text-2xl font-bold mb-4">Equipment Not Found</h2>
+        <Link to="/discover" className="text-primary hover:underline flex items-center gap-2">
+          <ArrowLeft className="w-4 h-4" /> Back to listings
+        </Link>
+      </div>
+    );
+  }
+
+  // Fallback data for fields not yet in our Supabase schema
+  const details = {
     rating: 4.8,
     reviews: 24,
     images: [
-      "https://images.unsplash.com/photo-1739066483931-b9d218fe50b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYWhpbmRyYSUyMHRyYWN0b3IlMjBpbmRpYXxlbnwxfHx8fDE3NzMzODkzNDB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      equipment.image || "https://images.unsplash.com/photo-1739066483931-b9d218fe50b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYWhpbmRyYSUyMHRyYWN0b3IlMjBpbmRpYXxlbnwxfHx8fDE3NzMzODkzNDB8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "https://images.unsplash.com/photo-1758636528604-a8b3d3824157?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZWQlMjB0cmFjdG9yJTIwd29ya2luZ3xlbnwxfHx8fDE3NzMzODkzMzh8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "https://images.unsplash.com/photo-1685335686020-e0b487f7f426?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxqb2huJTIwZGVlcmUlMjB0cmFjdG9yfGVufDF8fHx8MTc3MzM4OTM0MHww&ixlib=rb-4.1.0&q=80&w=1080"
     ],
-    description: "Well-maintained Mahindra 475 DI tractor, perfect for plowing, tilling, and general farm work. Regularly serviced and in excellent working condition. Comes with standard attachments.",
+    description: `Well-maintained ${equipment.name}, perfect for plowing, tilling, and general farm work. Regularly serviced and in excellent working condition. Comes with standard attachments.`,
     specifications: {
       "Engine Power": "42 HP",
       "Fuel Type": "Diesel",
@@ -32,15 +80,7 @@ const equipmentDetails = {
       equipmentCount: 3,
       joinedDate: "Member since 2023"
     }
-  }
-};
-
-export function EquipmentDetailPage() {
-  const { id } = useParams();
-  const [selectedImage, setSelectedImage] = useState(0);
-  const [date, setDate] = useState<Date | undefined>(new Date());
-
-  const equipment = equipmentDetails[Number(id) as keyof typeof equipmentDetails] || equipmentDetails[1];
+  };
 
   return (
     <div className="min-h-screen pt-16 bg-background">
@@ -60,13 +100,13 @@ export function EquipmentDetailPage() {
             <div className="space-y-4">
               <div className="aspect-[16/10] rounded-2xl overflow-hidden">
                 <ImageWithFallback
-                  src={equipment.images[selectedImage]}
+                  src={details.images[selectedImage]}
                   alt={equipment.name}
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="grid grid-cols-3 gap-4">
-                {equipment.images.map((image, index) => (
+                {details.images.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
@@ -87,17 +127,17 @@ export function EquipmentDetailPage() {
             {/* Description */}
             <div className="bg-card rounded-2xl p-6">
               <h2 className="text-2xl font-semibold mb-4">About this equipment</h2>
-              <p className="text-muted-foreground leading-relaxed">{equipment.description}</p>
+              <p className="text-muted-foreground leading-relaxed">{details.description}</p>
             </div>
 
             {/* Specifications */}
             <div className="bg-card rounded-2xl p-6">
               <h2 className="text-2xl font-semibold mb-4">Specifications</h2>
               <div className="grid grid-cols-2 gap-4">
-                {Object.entries(equipment.specifications).map(([key, value]) => (
+                {Object.entries(details.specifications).map(([key, value]) => (
                   <div key={key} className="border-b border-border pb-3">
                     <p className="text-sm text-muted-foreground mb-1">{key}</p>
-                    <p className="font-medium text-foreground">{value}</p>
+                    <p className="font-medium text-foreground">{value as string}</p>
                   </div>
                 ))}
               </div>
@@ -109,21 +149,21 @@ export function EquipmentDetailPage() {
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-full overflow-hidden">
                   <ImageWithFallback
-                    src={equipment.owner.image}
-                    alt={equipment.owner.name}
+                    src={details.owner.image}
+                    alt={details.owner.name}
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg">{equipment.owner.name}</h3>
+                  <h3 className="font-semibold text-lg">{details.owner.name}</h3>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
                     <div className="flex items-center gap-1">
                       <Star className="w-4 h-4 fill-secondary text-secondary" />
-                      <span>{equipment.owner.rating}</span>
+                      <span>{details.owner.rating}</span>
                     </div>
-                    <span>{equipment.owner.equipmentCount} equipment listed</span>
+                    <span>{details.owner.equipmentCount} equipment listed</span>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">{equipment.owner.joinedDate}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{details.owner.joinedDate}</p>
                 </div>
               </div>
             </div>
@@ -141,9 +181,9 @@ export function EquipmentDetailPage() {
                 <div className="flex items-center gap-4 mb-6">
                   <div className="flex items-center gap-1">
                     <Star className="w-4 h-4 fill-secondary text-secondary" />
-                    <span className="font-medium">{equipment.rating}</span>
+                    <span className="font-medium">{details.rating}</span>
                   </div>
-                  <span className="text-muted-foreground">({equipment.reviews} reviews)</span>
+                  <span className="text-muted-foreground">({details.reviews} reviews)</span>
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground mb-6">
                   <MapPin className="w-4 h-4" />
