@@ -48,38 +48,44 @@ export function ListEquipmentPage() {
     setIsSubmitting(true);
     setSubmitError(null);
     
-    let imageUrl = "https://images.unsplash.com/photo-1592982537447-7440770cbdi?fit=crop&q=80&w=800";
-    
-    // Upload image if present
-    if (imageFiles.length > 0) {
-      const { url, error: uploadError } = await import("../utils/equipmentData").then(m => m.uploadEquipmentImage(imageFiles[0]));
-      if (uploadError) {
-        setSubmitError(`${t('listEquipment.imageUploadFailed')}${uploadError}`);
-        setIsSubmitting(false);
-        return;
+    try {
+      let imageUrl = "https://images.unsplash.com/photo-1592982537447-7440770cbdi?fit=crop&q=80&w=800";
+      
+      // Upload image if present
+      if (imageFiles.length > 0) {
+        const { url, error: uploadError } = await import("../utils/equipmentData").then(m => m.uploadEquipmentImage(imageFiles[0]));
+        if (uploadError) {
+          setSubmitError(`${t('listEquipment.imageUploadFailed')}: ${uploadError}`);
+          setIsSubmitting(false);
+          return;
+        }
+        if (url) imageUrl = url;
       }
-      if (url) imageUrl = url;
-    }
 
-    const { error } = await saveUserEquipment({
-      name: formData.name,
-      image: imageUrl,
-      category: formData.type.charAt(0).toUpperCase() + formData.type.slice(1),
-      price: `₹${formData.price}`,
-      brand: "User Listed",
-      model_number: t('listEquipment.na'),
-      type: formData.description.slice(0, 30),
-      chc_id: parseInt(formData.chc),
-      ownerName,
-      ownerEmail,
-      ownerPhone,
-    }, user.id);
+      const { error } = await saveUserEquipment({
+        name: formData.name,
+        image: imageUrl,
+        category: formData.type.charAt(0).toUpperCase() + formData.type.slice(1),
+        price: `₹${formData.price}`,
+        brand: "User Listed",
+        model_number: t('listEquipment.na'),
+        type: formData.description.slice(0, 30),
+        chc_id: parseInt(formData.chc),
+        ownerName,
+        ownerEmail,
+        ownerPhone,
+      }, user.id);
 
-    setIsSubmitting(false);
-    if (error) {
-      setSubmitError(`${t('listEquipment.couldNotSave')}${error}`);
-    } else {
-      navigate("/discover");
+      if (error) {
+        setSubmitError(`${t('listEquipment.couldNotSave')}: ${error}`);
+      } else {
+        navigate("/discover");
+      }
+    } catch (err: any) {
+      console.error("Listing error:", err);
+      setSubmitError(err.message || "An unexpected error occurred during listing.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

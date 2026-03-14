@@ -39,6 +39,16 @@ export interface RentalRequest {
   createdAt: string;           // created_at
 }
 
+export interface EquipmentReview {
+  id: string;
+  equipmentId: number;
+  userId?: string;
+  userName: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+}
+
 // ─── Hardcoded Equipment (always shown, from CHC centers) ──────────
 export const EQUIPMENT_LIST: Equipment[] = [
   {
@@ -269,6 +279,45 @@ export async function updateRequestStatus(
     .from("rental_requests")
     .update({ status })
     .eq("id", requestId);
+}
+
+// ─── Review API ───────────────────────────────────────────────────
+
+function rowToReview(row: any): EquipmentReview {
+  return {
+    id: row.id,
+    equipmentId: row.equipment_id,
+    userId: row.user_id,
+    userName: row.user_name,
+    rating: row.rating,
+    comment: row.comment,
+    createdAt: row.created_at,
+  };
+}
+
+/** Fetch all reviews for a specific equipment */
+export async function getEquipmentReviews(equipmentId: number): Promise<EquipmentReview[]> {
+  const { data, error } = await supabase
+    .from("equipment_reviews")
+    .select("*")
+    .eq("equipment_id", equipmentId)
+    .order("created_at", { ascending: false });
+  if (error || !data) return [];
+  return data.map(rowToReview);
+}
+
+/** Add a new review */
+export async function addEquipmentReview(
+  review: Omit<EquipmentReview, "id" | "createdAt">
+): Promise<{ error: string | null }> {
+  const { error } = await supabase.from("equipment_reviews").insert({
+    equipment_id: review.equipmentId,
+    user_id: review.userId,
+    user_name: review.userName,
+    rating: review.rating,
+    comment: review.comment,
+  });
+  return { error: error?.message || null };
 }
 
 // ─── Storage API ───────────────────────────────────────────────────
