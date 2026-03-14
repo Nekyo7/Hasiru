@@ -62,7 +62,7 @@ export function ListEquipmentPage() {
     
     try {
       // Default placeholder image
-      let imageUrl = "https://images.unsplash.com/photo-1592982537447-7440770cbdi?fit=crop&q=80&w=800";
+      let imageUrl = "https://images.unsplash.com/photo-1592982537447-7440770cbf9f?fit=crop&q=80&w=800";
       
       // Upload image if present (Safe handling)
       if (imageFiles.length > 0) {
