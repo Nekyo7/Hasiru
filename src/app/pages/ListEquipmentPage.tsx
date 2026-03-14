@@ -71,18 +71,15 @@ export function ListEquipmentPage() {
           const { url, error: uploadError } = await import("../utils/equipmentData").then(m => m.uploadEquipmentImage(imageFiles[0]));
           if (uploadError || !url) {
             console.error("Image upload failed:", uploadError);
-            // Instead of just giving up and using the default image, let's use the local file Blob URL 
-            // so the user who listed it can still see their upload on the Discovery page.
-            console.log("Continuing with local ObjectURL due to upload failure.");
-            imageUrl = URL.createObjectURL(imageFiles[0]);
+            console.log("Continuing with default placeholder due to upload failure.");
+            // Kept default imageUrl instead of local ObjectURL so it can be viewed by others
           } else if (url) {
             console.log("Image uploaded successfully:", url);
             imageUrl = url;
           }
         } catch (imgErr) {
           console.error("Critical image upload error:", imgErr);
-          // Fallback to local
-          imageUrl = URL.createObjectURL(imageFiles[0]);
+          // Keep default imageUrl fallback
         }
       }
 

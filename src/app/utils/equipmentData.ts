@@ -165,9 +165,7 @@ function rowToRequest(row: any): RentalRequest {
 
 // ─── Equipment API ─────────────────────────────────────────────────
 
-const LOCAL_STORAGE_KEY = "hasiru_user_listings";
-
-/** Save a new equipment listing to Supabase (and localStorage as fallback) */
+/** Save a new equipment listing to Supabase */
 export async function saveUserEquipment(
   equipment: Omit<Equipment, "id" | "available" | "distance">,
   userId: string
@@ -202,25 +200,6 @@ export async function saveUserEquipment(
     supabaseError = err.message || "Unknown database error";
   }
 
-  // 2. Always save to localStorage as well (per user request for reliability)
-  try {
-    const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
-    const listings: Equipment[] = localData ? JSON.parse(localData) : [];
-    const newId = -Date.now(); // Use negative ID to avoid collision with Supabase serials
-    const newListing: Equipment = {
-      ...equipment,
-      id: newId,
-      available: true,
-      distance: "Nearby",
-      created_at: new Date().toISOString()
-    };
-    listings.unshift(newListing); // Add to front
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(listings));
-    console.log("Saved to localStorage successfully as fallback.");
-  } catch (lsError) {
-    console.error("LocalStorage save error:", lsError);
-  }
-
   return { error: supabaseError };
 }
 
@@ -252,33 +231,15 @@ export async function getSupabaseEquipment(chcId?: number): Promise<Equipment[]>
   }
 }
 
-/** Fetch user-listed equipment from LocalStorage */
-export function getLocalEquipment(chcId?: number): Equipment[] {
-  try {
-    const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (!localData) return [];
-    let listings: Equipment[] = JSON.parse(localData);
-    if (chcId) {
-      listings = listings.filter(e => e.chc_id === chcId);
-    }
-    return listings;
-  } catch (e) {
-    console.error("LocalStorage fetch exception:", e);
-    return [];
-  }
-}
 
-/** Merge all sources: Supabase + LocalStorage + Hardcoded */
+/** Merge all sources: Supabase + Hardcoded */
 export async function getAllEquipment(chcId?: number): Promise<Equipment[]> {
   console.log("Fetching all equipment for CHC:", chcId);
   
-  const [supabaseList, localList] = await Promise.all([
-    getSupabaseEquipment(chcId),
-    Promise.resolve(getLocalEquipment(chcId))
-  ]);
-
-  // Merge dynamic lists
-  const dynamicList = [...localList, ...supabaseList];
+  const supabaseList = await getSupabaseEquipment(chcId);
+  
+  // Dynamic list comes only from Supabase now
+  const dynamicList = [...supabaseList];
   
   // Remove duplicates by ID (if someone saved to both and we fetched both)
   const seenIds = new Set();
