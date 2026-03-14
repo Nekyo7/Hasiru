@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { MapPin, Filter, Search, Tractor, ArrowLeft, Loader2 } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { getSelectedCHC } from "../utils/auth";
@@ -7,11 +7,21 @@ import { getAllEquipment } from "../utils/equipmentData";
 
 export function DiscoveryPage() {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchParams] = useSearchParams();
+  const initialQuery = searchParams.get("q") || "";
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [selectedEquipment, setSelectedEquipment] = useState<number | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<string>("");
   const [equipmentList, setEquipmentList] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Update searchQuery if URL changes
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q !== null) {
+      setSearchQuery(q);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     // Get user's selected CHC from auth utilities

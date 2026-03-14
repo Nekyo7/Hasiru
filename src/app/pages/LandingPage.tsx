@@ -1,4 +1,7 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router";
+import { getSelectedCHC } from "../utils/auth";
+import { getAllEquipment, Equipment } from "../utils/equipmentData";
 import { Tractor, Wheat, Droplet, Sprout, Truck, ArrowRight, MapPin, Clock } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 
@@ -35,34 +38,18 @@ const categories = [
   }
 ];
 
-const featuredListings = [
-  {
-    id: 1,
-    name: "Mahindra 475 DI Tractor",
-    distance: "3 km away",
-    price: "₹550",
-    available: true,
-    image: "https://images.unsplash.com/photo-1739066483931-b9d218fe50b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYWhpbmRyYSUyMHRyYWN0b3IlMjBpbmRpYXxlbnwxfHx8fDE3NzMzODkzNDB8MA&ixlib=rb-4.1.0&q=80&w=1080"
-  },
-  {
-    id: 2,
-    name: "John Deere 5055E",
-    distance: "5.2 km away",
-    price: "₹750",
-    available: true,
-    image: "https://images.unsplash.com/photo-1685335686020-e0b487f7f426?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxqb2huJTIwZGVlcmUlMjB0cmFjdG9yfGVufDF8fHx8MTc3MzM4OTM0MHww&ixlib=rb-4.1.0&q=80&w=1080"
-  },
-  {
-    id: 3,
-    name: "Combine Harvester",
-    distance: "8 km away",
-    price: "₹2,500",
-    available: false,
-    image: "https://images.unsplash.com/photo-1655818805647-585cb9c9b02a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYXJtJTIwbWFjaGluZXJ5JTIwZXF1aXBtZW50fGVufDF8fHx8MTc3MzMwODE0Nnww&ixlib=rb-4.1.0&q=80&w=1080"
-  }
-];
-
 export function LandingPage() {
+  const [featuredListings, setFeaturedListings] = useState<Equipment[]>([]);
+
+  useEffect(() => {
+    const selectedCHC = getSelectedCHC();
+    if (selectedCHC) {
+      setFeaturedListings(getAllEquipment(selectedCHC.id).slice(0, 3));
+    } else {
+      setFeaturedListings(getAllEquipment().slice(0, 3));
+    }
+  }, []);
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -112,7 +99,7 @@ export function LandingPage() {
           {categories.map((category) => (
             <Link
               key={category.name}
-              to="/discover"
+              to={`/discover?q=${encodeURIComponent(category.name)}`}
               className="group relative overflow-hidden rounded-2xl bg-card shadow-md hover:shadow-xl transition-all hover:-translate-y-1"
             >
               <div className="aspect-[4/3] overflow-hidden">
@@ -193,34 +180,7 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Community Section */}
-      <section className="py-16 px-4 bg-primary/5">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="bg-primary rounded-2xl p-4 w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <Tractor className="w-8 h-8 text-primary-foreground" />
-              </div>
-              <h3 className="text-2xl font-semibold mb-2">600+ Machines</h3>
-              <p className="text-muted-foreground">Available across regions</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-secondary rounded-2xl p-4 w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <MapPin className="w-8 h-8 text-secondary-foreground" />
-              </div>
-              <h3 className="text-2xl font-semibold mb-2">50+ Districts</h3>
-              <p className="text-muted-foreground">Growing community network</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-accent rounded-2xl p-4 w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <Clock className="w-8 h-8 text-accent-foreground" />
-              </div>
-              <h3 className="text-2xl font-semibold mb-2">24/7 Support</h3>
-              <p className="text-muted-foreground">For farmers, by farmers</p>
-            </div>
-          </div>
-        </div>
-      </section>
+
     </div>
   );
 }
