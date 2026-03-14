@@ -15,6 +15,7 @@ export interface Equipment {
   chc_id: number;
   ownerName?: string;      // maps to owner_name in DB
   ownerEmail?: string;     // maps to owner_email in DB
+  ownerPhone?: string;     // maps to owner_phone in DB
   ownerUserId?: string;    // maps to owner_user_id in DB
   created_at?: string;
 }
@@ -118,6 +119,7 @@ function rowToEquipment(row: any): Equipment {
     chc_id: row.chc_id || 0,
     ownerName: row.owner_name,
     ownerEmail: row.owner_email,
+    ownerPhone: row.owner_phone,
     ownerUserId: row.owner_user_id,
     created_at: row.created_at,
   };
@@ -162,6 +164,7 @@ export async function saveUserEquipment(
     chc_id: equipment.chc_id,
     owner_name: equipment.ownerName,
     owner_email: equipment.ownerEmail,
+    owner_phone: equipment.ownerPhone,
     owner_user_id: userId,
   });
   return { error: error?.message || null };

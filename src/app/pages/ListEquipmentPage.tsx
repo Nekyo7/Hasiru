@@ -11,6 +11,7 @@ export function ListEquipmentPage() {
   const userMeta = user?.user_metadata || {};
   const ownerName: string = userMeta.name || userMeta.full_name || user?.email?.split("@")[0] || "Farmer";
   const ownerEmail: string = user?.email || "";
+  const ownerPhone: string = userMeta.phone || "";
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -69,6 +70,7 @@ export function ListEquipmentPage() {
       chc_id: parseInt(formData.chc),
       ownerName,
       ownerEmail,
+      ownerPhone,
     }, user.id);
 
     setIsSubmitting(false);
