@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
-import { getSelectedCHC } from "../utils/auth";
+import { getSelectedCHC, hasCompletedSetup } from "../utils/auth";
 import { getAllEquipment, Equipment } from "../utils/equipmentData";
 import { Tractor, Wheat, Droplet, Sprout, Truck, ArrowRight, MapPin, Clock } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
@@ -70,21 +70,23 @@ export function LandingPage() {
           <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto">
             A local marketplace where farmers can rent tractors, harvesters, and agricultural tools from nearby owners.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/signup"
-              className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-xl text-lg hover:scale-105 transition-transform shadow-lg"
-            >
-              <span>Get Started</span>
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              to="/chc-centers"
-              className="inline-flex items-center justify-center gap-2 bg-secondary text-secondary-foreground px-8 py-4 rounded-xl text-lg hover:scale-105 transition-transform shadow-lg"
-            >
-              <span>Browse CHC Centers</span>
-            </Link>
-          </div>
+          {!hasCompletedSetup() && (
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/signup"
+                className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-xl text-lg hover:scale-105 transition-transform shadow-lg"
+              >
+                <span>Get Started</span>
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+              <Link
+                to="/chc-centers"
+                className="inline-flex items-center justify-center gap-2 bg-secondary text-secondary-foreground px-8 py-4 rounded-xl text-lg hover:scale-105 transition-transform shadow-lg"
+              >
+                <span>Browse CHC Centers</span>
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 
