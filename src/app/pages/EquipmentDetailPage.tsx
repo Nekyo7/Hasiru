@@ -319,12 +319,20 @@ export function EquipmentDetailPage() {
               </div>
             </div>
             
-            <div className="space-y-4 max-h-[40vh] overflow-y-auto pr-2 text-sm text-muted-foreground leading-relaxed custom-scrollbar">
-              <p>1. <strong>Usage:</strong> The equipment must only be used for the intended purpose and in accordance with the manufacturer's guidelines.</p>
-              <p>2. <strong>Maintenance:</strong> The Renter is responsible for basic daily maintenance (fuel, oil checks) during the rental period.</p>
-              <p>3. <strong>Damage:</strong> Any damage caused due to negligence will be the liability of the Renter. Existing issues must be reported before start.</p>
-              <p>4. <strong>Return:</strong> Equipment must be returned on time. Late returns may incur additional hourly charges.</p>
-              <p>5. <strong>Insurance:</strong> Base insurance is included, covering standard mechanical failures but not operator errors.</p>
+            <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2 text-sm text-muted-foreground leading-relaxed custom-scrollbar">
+              <div className="space-y-4">
+                <p>1. <strong>General:</strong> By requesting to rent equipment through the Smart CHC Network platform, the user agrees to follow all rules and conditions set by the Custom Hiring Center (CHC) and the platform.</p>
+                <p>2. <strong>User Information:</strong> The user must provide correct details including name, phone number, email, and address. Providing false information may lead to cancellation of the request.</p>
+                <p>3. <strong>Availability of Equipment:</strong> All equipment is subject to availability at the selected CHC. Submitting a request does not guarantee confirmation until the CHC approves the booking.</p>
+                <p>4. <strong>Rental Duration:</strong> The user must return the equipment within the approved rental time. Late return may result in extra charges decided by the CHC.</p>
+                <p>5. <strong>Usage Responsibility:</strong> The user must use the equipment only for agricultural purposes. Any damage caused due to misuse will be the responsibility of the user.</p>
+                <p>6. <strong>Damage and Loss:</strong> If equipment is damaged, lost, or returned in poor condition, the user may be required to pay repair or replacement cost as decided by the CHC operator.</p>
+                <p>7. <strong>Payment:</strong> Rental charges will be decided based on machine type, duration, and CHC rules. Payment may be collected at the CHC or during delivery.</p>
+                <p>8. <strong>Cancellation:</strong> The CHC has the right to cancel or reschedule the booking if equipment is not available or due to operational reasons.</p>
+                <p>9. <strong>Contact with CHC:</strong> The user may contact the selected CHC for help, schedule changes, or support.</p>
+                <p>10. <strong>Platform Role:</strong> Smart CHC Network is a digital platform that connects users with Custom Hiring Centers. The platform is not responsible for physical damage, delays, or disputes between user and CHC.</p>
+                <p>11. <strong>Acceptance:</strong> By clicking "Agree and Request", the user confirms that they have read and accepted all terms and conditions.</p>
+              </div>
             </div>
 
             <div className="mt-8 flex gap-3">
