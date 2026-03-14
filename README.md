@@ -1,155 +1,127 @@
-# Smart CHC Network – AI Powered Farm Equipment Sharing Platform
+<a id="readme-top"></a>
 
-## Overview
+<div align="center">
+  <img src="images/logo.png" alt="Hasiru Logo" width="120" height="120">
 
-Smart CHC Network is a web platform that digitizes Custom Hiring Centers (CHC) and connects farmers, equipment owners, and service centers into one intelligent system.
-The platform allows farmers to find, book, and share agricultural machinery easily while improving scheduling, availability tracking, and cost optimization.
+  <h1 align="center">Hasiru</h1>
 
-This project is built to improve the existing Custom Hiring Center system used in India by adding online booking, smart recommendations, and cooperative renting.
+  <p align="center">
+    A smart farm equipment rental platform connecting farmers, equipment owners, and CHC hubs.
+    <br />
+    Making agricultural machinery more accessible, discoverable, and rentable.
+  </p>
 
----
-
-## Problem Statement
-
-Custom Hiring Centers (CHC) are government-supported physical centers where farmers can rent agricultural equipment instead of buying expensive machinery.
-However, the current system is mostly offline and has several problems:
-
-* No proper online booking system
-* Difficult to check machine availability
-* Poor scheduling and delays
-* Limited communication between farmers and CHC
-* No smart recommendation for equipment
-* No connection between multiple CHC centers
-
-Small farmers often struggle to get the right equipment at the right time.
+  <p align="center">
+    <a href="https://github.com/Nekyo7/Hasiru">View Repository</a>
+    ·
+    <a href="https://v0-hasiru.vercel.app">Live Demo</a>
+  </p>
+</div>
 
 ---
 
-## Proposed Solution
+## Preview
 
-Smart CHC Network converts physical Custom Hiring Centers into digital service hubs.
-
-The system allows farmers to:
-
-* Find nearby CHC centers
-* Check available machines in real time
-* Book equipment online
-* Contact CHC for help
-* Get equipment recommendations based on crop and land size
-* Share equipment with other farmers
-
-Each CHC acts as:
-
-* Equipment storage center
-* Help desk for farmers
-* Booking and scheduling hub
-* Service support center
+<div align="center">
+  <img src="images/homepage.png" alt="Hasiru Homepage" width="800">
+</div>
 
 ---
 
-## Key Features
+## About The Project
 
-### 1. Equipment Marketplace
+Hasiru is a farm equipment rental and discovery platform designed to help users access agricultural machinery through nearby CHC hubs.
 
-Farmers can browse available machines from CHC or other farmers.
+Instead of farmers needing to own every machine themselves, Hasiru helps them:
 
-### 2. CHC Center Directory
+- discover available equipment nearby
+- list machinery for rent
+- choose the CHC hub where equipment will be rented
+- improve equipment utilization
+- simplify the farm rental process digitally
 
-Shows nearby Custom Hiring Centers with available equipment.
-
-### 3. Online Booking System
-
-Farmers can request machines and schedule usage.
-
-### 4. Smart Recommendation
-
-Suggests suitable equipment based on:
-
-* Crop
-* Land size
-* Location
-
-### 5. Group Renting
-
-Multiple farmers can share equipment and split cost.
-
-### 6. CHC Operator Dashboard
-
-CHC managers can:
-
-* Add machines
-* Approve bookings
-* Manage schedule
-
-### 7. Help / Contact System
-
-Farmers can contact CHC directly for assistance.
+This creates value for both equipment owners and farmers by reducing idle machinery and improving access to tools.
 
 ---
 
-## How the System Works
+## Features
 
-1. Farmer opens website
-2. Farmer enters location and requirement
-3. System shows nearby CHC and equipment
-4. Farmer books or contacts CHC
-5. CHC operator confirms booking
-6. Machine is provided to farmer
-7. Booking completed and updated in system
-
----
-
-## Innovation
-
-This project improves the existing CHC system by adding:
-
-* Digital booking platform
-* AI-based equipment suggestion
-* Multi-CHC connection
-* Smart scheduling
-* Group renting
-* Real-time availability tracking
-
-This makes farm equipment access faster, cheaper, and more efficient.
+- User-friendly landing page
+- Equipment discovery page
+- Equipment detail pages
+- List Equipment form
+- CHC hub selection for equipment rentals
+- Map-based equipment browsing
+- Supabase backend integration
+- Vercel deployment
+- Local fallback support for selected development flows
 
 ---
 
-## Tech Stack
+## Built With
 
-Frontend:
-
-* React
-* Tailwind CSS
-
-Backend:
-
-* Firebase / Supabase
-
-Database:
-
-* Firestore / PostgreSQL
-
-Tools:
-
-* Vite / Next.js
-* VS Code
+- React
+- TypeScript
+- Vite
+- Supabase
+- React Router
+- Vercel
 
 ---
 
-## Future Enhancements
+## Screenshots
 
-* Mobile app for farmers
-* GPS tracking of machines
-* Payment integration
-* Voice support for rural users
-* Multi-language support
-* Government portal integration
+### Landing Page
+
+<div align="center">
+  <img src="images/homepage.png" alt="Landing Page" width="800">
+</div>
+
+The landing page introduces the platform and gives users a quick overview of Hasiru’s purpose and flow.
 
 ---
 
-## Conclusion
+### Discovery Page
 
-Smart CHC Network is a practical and innovative solution that enhances the existing Custom Hiring Center system by making it digital, intelligent, and easy to use.
-It helps farmers access machinery quickly, reduces cost, and improves agricultural efficiency.
+<div align="center">
+  <img src="images/discovery.png" alt="Discovery Page" width="800">
+</div>
 
-  
+Users can browse available farm equipment and discover machinery listed for rental.
+
+---
+
+### Equipment Listing Page
+
+<div align="center">
+  <img src="images/list-equipment.png" alt="List Equipment Page" width="800">
+</div>
+
+Equipment owners can submit their machinery, enter details, and choose the CHC hub for rental.
+
+---
+
+### Equipment Detail Page
+
+<div align="center">
+  <img src="images/equipment-detail.png" alt="Equipment Detail Page" width="800">
+</div>
+
+Detailed equipment pages show more information about listed machinery.
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+Make sure you have:
+
+- Node.js
+- npm
+
+Check versions:
+
+```sh
+node -v
+npm -v
