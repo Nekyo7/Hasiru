@@ -74,7 +74,7 @@ This creates value for both equipment owners and farmers by reducing idle machin
 ### Landing Page
 
 <div align="center">
-  <img src="images/homepage.png" alt="Landing Page" width="800">
+  <img src="images/auth.png" alt="Landing Page" width="800">
 </div>
 
 The landing page introduces the platform and gives users a quick overview of Hasiru’s purpose and flow.
@@ -92,10 +92,6 @@ Users can browse available farm equipment and discover machinery listed for rent
 ---
 
 ### Equipment Listing Page
-
-<div align="center">
-  <img src="images/list-equipment.png" alt="List Equipment Page" width="800">
-</div>
 
 Equipment owners can submit their machinery, enter details, and choose the CHC hub for rental.
 
