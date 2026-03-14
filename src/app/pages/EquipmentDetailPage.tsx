@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router";
-import { MapPin, Star, Shield, Calendar, ArrowLeft, User, Loader2, Building2, Send, CheckCircle, Phone } from "lucide-react";
+import { MapPin, Star, Shield, Calendar, ArrowLeft, User, Loader2, Building2, Send, CheckCircle, Phone, XCircle } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { Calendar as CalendarComponent } from "../components/ui/calendar";
 import { getAllEquipment, saveRentalRequest } from "../utils/equipmentData";
@@ -19,6 +19,7 @@ export function EquipmentDetailPage() {
   const [requestSent, setRequestSent] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const userMeta = user?.user_metadata || {};
   const userName: string = userMeta.name || userMeta.full_name || user?.email?.split("@")[0] || "Farmer";
@@ -41,28 +42,38 @@ export function EquipmentDetailPage() {
     }
     if (!equipment || !user) return;
 
+    setSubmitError(null);
     setIsRequesting(true);
 
-    const selectedDate = date ? date.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) : "TBD";
-    const priceNum = parseInt(equipment.price.replace(/[^\d]/g, "")) || 0;
-    const total = `₹${priceNum * hours}`;
+    try {
+      const selectedDate = date ? date.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) : "TBD";
+      const priceNum = parseInt(equipment.price.replace(/[^\d]/g, "")) || 0;
+      const total = `₹${priceNum * hours}`;
 
-    const { error } = await saveRentalRequest({
-      equipmentId: equipment.id,
-      equipmentName: equipment.name,
-      equipmentImage: equipment.image,
-      requesterEmail: user.email || "",
-      requesterName: userName,
-      requesterPhone: userPhone,
-      ownerEmail: equipment.ownerEmail || "admin@hasiru.in",
-      ownerName: equipment.ownerName || "CHC Admin",
-      date: selectedDate,
-      hours,
-      totalPrice: total,
-    }, user.id);
+      const { error } = await saveRentalRequest({
+        equipmentId: equipment.id,
+        equipmentName: equipment.name,
+        equipmentImage: equipment.image,
+        requesterEmail: user.email || "",
+        requesterName: userName,
+        requesterPhone: userPhone,
+        ownerEmail: equipment.ownerEmail || "admin@hasiru.in",
+        ownerName: equipment.ownerName || "CHC Admin",
+        date: selectedDate,
+        hours,
+        totalPrice: total,
+      }, user.id);
 
-    setIsRequesting(false);
-    if (!error) setRequestSent(true);
+      if (error) {
+        setSubmitError(error);
+      } else {
+        setRequestSent(true);
+      }
+    } catch (err: any) {
+      setSubmitError(err.message || "An unexpected error occurred. Please try again.");
+    } finally {
+      setIsRequesting(false);
+    }
   };
 
   if (isLoading) {
@@ -270,6 +281,13 @@ export function EquipmentDetailPage() {
                   )}
                 </div>
 
+                {submitError && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl flex items-center gap-2 animate-in slide-in-from-top-1">
+                    <XCircle className="w-4 h-4 flex-shrink-0" />
+                    <span>{submitError}</span>
+                  </div>
+                )}
+
                 {requestSent ? (
                   <div className="w-full bg-green-100 text-green-800 py-4 rounded-xl font-semibold flex items-center justify-center gap-2">
                     <CheckCircle className="w-5 h-5" />
@@ -279,12 +297,15 @@ export function EquipmentDetailPage() {
                   <button
                     onClick={handleRequestBooking}
                     disabled={isRequesting || !acceptedTerms}
-                    className="w-full bg-primary text-primary-foreground py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-70 disabled:grayscale flex items-center justify-center gap-2"
+                    className="w-full bg-primary text-primary-foreground py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-70 disabled:grayscale flex items-center justify-center gap-2 relative overflow-hidden group"
                   >
                     {isRequesting ? (
                       <><Loader2 className="w-5 h-5 animate-spin" /> Sending Request...</>
                     ) : (
-                      <><Send className="w-5 h-5" /> Request Booking</>
+                      <>
+                        <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /> 
+                        Request Booking
+                      </>
                     )}
                   </button>
                 )}
