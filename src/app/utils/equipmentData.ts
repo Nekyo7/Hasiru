@@ -362,24 +362,55 @@ export async function addEquipmentReview(
 // ─── Storage API ───────────────────────────────────────────────────
 
 /** 
- * Upload an image to Supabase Storage and return the public URL 
+ * Convert an image to a Base64 string directly to store in the Database, bypassing Storage issues.
  */
 export async function uploadEquipmentImage(file: File): Promise<{ url: string | null; error: string | null }> {
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
-  const filePath = `${fileName}`;
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+        let width = img.width;
+        let height = img.height;
 
-  const { error: uploadError } = await supabase.storage
-    .from('equipment-images')
-    .upload(filePath, file);
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
 
-  if (uploadError) {
-    return { url: null, error: uploadError.message };
-  }
-
-  const { data } = supabase.storage
-    .from('equipment-images')
-    .getPublicUrl(filePath);
-
-  return { url: data.publicUrl, error: null };
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          resolve({ url: dataUrl, error: null });
+        } else {
+          resolve({ url: e.target?.result as string, error: null });
+        }
+      };
+      img.onerror = () => {
+        resolve({ url: e.target?.result as string, error: null });
+      };
+      if (e.target?.result) {
+        img.src = e.target.result as string;
+      } else {
+        resolve({ url: null, error: "Failed to read file" });
+      }
+    };
+    reader.onerror = () => {
+      resolve({ url: null, error: "Failed to read file" });
+    };
+    reader.readAsDataURL(file);
+  });
 }
