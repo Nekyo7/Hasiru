@@ -123,11 +123,22 @@ export const EQUIPMENT_LIST: Equipment[] = [
 ];
 
 // ─── DB Row ↔ App Type Mappers ─────────────────────────────────────
+function getImageUrl(imagePath: string): string {
+  if (!imagePath) return "";
+  // If it's already a full URL (http/https), a base64 string (data:), or a local public path (/)
+  if (imagePath.startsWith("http") || imagePath.startsWith("data:") || imagePath.startsWith("/")) {
+    return imagePath;
+  }
+  // Otherwise, assume it's a Supabase storage path and generate its public URL
+  const { data } = supabase.storage.from("equipment-images").getPublicUrl(imagePath);
+  return data.publicUrl;
+}
+
 function rowToEquipment(row: any): Equipment {
   return {
     id: row.id,
     name: row.name,
-    image: row.image || "",
+    image: getImageUrl(row.image),
     distance: row.distance || "Nearby",
     price: row.price || "₹0",
     available: row.available ?? true,
@@ -149,7 +160,7 @@ function rowToRequest(row: any): RentalRequest {
     id: row.id,
     equipmentId: row.equipment_id,
     equipmentName: row.equipment_name,
-    equipmentImage: row.equipment_image || "",
+    equipmentImage: getImageUrl(row.equipment_image),
     requesterEmail: row.requester_email,
     requesterName: row.requester_name,
     requesterPhone: row.requester_phone,
