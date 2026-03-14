@@ -1,8 +1,9 @@
 import { Link, useLocation, useNavigate } from "react-router";
-import { Tractor, LayoutDashboard, Plus, Building2, BookOpen, User, LogOut, UserCircle } from "lucide-react";
+import { Tractor, LayoutDashboard, Plus, Building2, BookOpen, User, LogOut, UserCircle, Globe } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { clearSetupSession } from "../utils/auth";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export function Navigation() {
   const location = useLocation();
@@ -11,6 +12,7 @@ export function Navigation() {
   const [showDropdown, setShowDropdown] = useState(false);
   
   const { user, isAuthenticated, signOut } = useAuth();
+  const { language, setLanguage, t } = useLanguage();
   const currentUser = user?.user_metadata || {};
 
   const handleLogout = async () => {
@@ -19,6 +21,9 @@ export function Navigation() {
     setShowDropdown(false);
     navigate("/login", { replace: true });
   };
+
+  const currentHeaderTextColor = isHome ? "text-white" : "text-foreground";
+  const currentHeaderHoverColor = isHome ? "hover:text-secondary" : "hover:text-primary";
 
   return (
     <nav className={`top-0 z-50 transition-all w-full ${
@@ -37,41 +42,41 @@ export function Navigation() {
             </span>
           </Link>
 
-          <div className="flex items-center gap-6">
-            <Link
-              to="/"
-              className={`transition-colors ${
-                isHome ? "text-white hover:text-secondary" : "text-foreground hover:text-primary"
-              }`}
+          <div className="flex items-center gap-4 sm:gap-6">
+            <button
+              onClick={() => setLanguage(language === 'en' ? 'kn' : 'en')}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-colors ${
+                isHome 
+                  ? "border-white/30 text-white hover:bg-white/10" 
+                  : "border-border text-foreground hover:bg-muted"
+              } text-sm font-medium`}
             >
-              <span>Home</span>
-            </Link>
-            <Link
-              to="/chc-centers"
-              className={`flex items-center gap-2 transition-colors ${
-                isHome ? "text-white hover:text-secondary" : "text-foreground hover:text-primary"
-              }`}
-            >
-              <Building2 className="w-4 h-4" />
-              <span className="hidden sm:inline">CHC Centers</span>
-            </Link>
-            <Link
-              to="/discover"
-              className={`flex items-center gap-2 transition-colors ${
-                isHome ? "text-white hover:text-secondary" : "text-foreground hover:text-primary"
-              }`}
-            >
-              <span>Find Equipment</span>
-            </Link>
-            <Link
-              to="/dashboard"
-              className={`flex items-center gap-2 transition-colors ${
-                isHome ? "text-white hover:text-secondary" : "text-foreground hover:text-primary"
-              }`}
-            >
-              <BookOpen className="w-4 h-4" />
-              <span className="hidden sm:inline">My Bookings</span>
-            </Link>
+              <Globe className="w-4 h-4" />
+              {language === 'en' ? 'ಕನ್ನಡ' : 'English'}
+            </button>
+
+            <div className="hidden md:flex items-center gap-6">
+              <Link
+                to="/chc-centers"
+                className={`flex items-center gap-2 transition-colors ${currentHeaderTextColor} ${currentHeaderHoverColor}`}
+              >
+                <Building2 className="w-4 h-4" />
+                <span>{t('nav.chcCenters')}</span>
+              </Link>
+              <Link
+                to="/discover"
+                className={`flex items-center gap-2 transition-colors ${currentHeaderTextColor} ${currentHeaderHoverColor}`}
+              >
+                <span>{t('nav.findEquipment')}</span>
+              </Link>
+              <Link
+                to="/dashboard"
+                className={`flex items-center gap-2 transition-colors ${currentHeaderTextColor} ${currentHeaderHoverColor}`}
+              >
+                <BookOpen className="w-4 h-4" />
+                <span>{t('nav.dashboard')}</span>
+              </Link>
+            </div>
 
             {/* Profile Dropdown */}
             {isAuthenticated ? (
@@ -113,14 +118,14 @@ export function Navigation() {
                       onClick={() => setShowDropdown(false)}
                     >
                       <LayoutDashboard className="w-4 h-4" />
-                      Dashboard
+                      {t('nav.dashboard')}
                     </Link>
                     <button
                       onClick={handleLogout}
                       className="w-full flex items-center gap-2 px-4 py-3 hover:bg-muted transition-colors text-foreground text-sm border-t border-border"
                     >
                       <LogOut className="w-4 h-4" />
-                      Logout
+                      {t('nav.signOut')}
                     </button>
                   </div>
                 )}
@@ -136,17 +141,17 @@ export function Navigation() {
               >
                 <span className="flex items-center gap-2">
                   <User className="w-4 h-4" />
-                  <span className="hidden sm:inline">Sign In</span>
+                  <span className="hidden sm:inline">{t('nav.login')}</span>
                 </span>
               </Link>
             )}
 
             <Link
               to="/list-equipment"
-              className="flex items-center gap-2 bg-secondary text-secondary-foreground px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+              className="flex items-center gap-2 bg-secondary text-secondary-foreground px-4 py-2 rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap"
             >
               <Plus className="w-4 h-4" />
-              <span>List Machine</span>
+              <span className="hidden sm:inline">{t('nav.listEquipment')}</span>
             </Link>
           </div>
         </div>
