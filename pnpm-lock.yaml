@@ -107,6 +107,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.99.1
         version: 2.99.1
+      base64-arraybuffer:
+        specifier: ^1.0.2
+        version: 1.0.2
       canvas-confetti:
         specifier: 1.9.4
         version: 1.9.4
@@ -1616,6 +1619,10 @@ packages:
   babel-plugin-macros@3.1.0:
     resolution: {integrity: sha512-Cg7TFGpIr01vOQNODXOOaGz2NpCU5gl8x1qJFbb6hbZxR7XrcE2vtbAsTAbJ7/xwJtUuJEw8K8Zr/AE0LHlesg==}
     engines: {node: '>=10', npm: '>=6'}
+
+  base64-arraybuffer@1.0.2:
+    resolution: {integrity: sha512-I3yl4r9QB5ZRY3XuJVEPfc2XhZO6YweFPI+UovAzn+8/hb3oJ6lnysaFcjVpkCPfVWFUDvoZ8kmVDP7WyRtYtQ==}
+    engines: {node: '>= 0.6.0'}
 
   baseline-browser-mapping@2.10.7:
     resolution: {integrity: sha512-1ghYO3HnxGec0TCGBXiDLVns4eCSx4zJpxnHrlqFQajmhfKMQBzUGDdkMK7fUW7PTHTeLf+j87aTuKuuwWzMGw==}
@@ -3709,6 +3716,8 @@ snapshots:
       '@babel/runtime': 7.28.6
       cosmiconfig: 7.1.0
       resolve: 1.22.11
+
+  base64-arraybuffer@1.0.2: {}
 
   baseline-browser-mapping@2.10.7: {}
 

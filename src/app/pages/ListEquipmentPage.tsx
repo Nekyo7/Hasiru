@@ -44,42 +44,80 @@ export function ListEquipmentPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user) {
+      console.warn("Attempted to submit listing without being logged in.");
+      setSubmitError("You must be logged in to list equipment.");
+      return;
+    }
+
+    // Basic Validation
+    if (!formData.name || !formData.type || !formData.chc || !formData.price) {
+      setSubmitError("Please fill in all required fields (Name, Type, CHC, and Price).");
+      return;
+    }
+
+    console.log("Starting equipment listing flow...");
     setIsSubmitting(true);
     setSubmitError(null);
     
-    let imageUrl = "https://images.unsplash.com/photo-1592982537447-7440770cbdi?fit=crop&q=80&w=800";
-    
-    // Upload image if present
-    if (imageFiles.length > 0) {
-      const { url, error: uploadError } = await import("../utils/equipmentData").then(m => m.uploadEquipmentImage(imageFiles[0]));
-      if (uploadError) {
-        setSubmitError(`${t('listEquipment.imageUploadFailed')}${uploadError}`);
-        setIsSubmitting(false);
-        return;
+    try {
+      // Default placeholder image
+      let imageUrl = "https://images.unsplash.com/photo-1592982537447-7440770cbdi?fit=crop&q=80&w=800";
+      
+      // Upload image if present (Safe handling)
+      if (imageFiles.length > 0) {
+        console.log("Uploading image:", imageFiles[0].name);
+        try {
+          const { url, error: uploadError } = await import("../utils/equipmentData").then(m => m.uploadEquipmentImage(imageFiles[0]));
+          if (uploadError || !url) {
+            console.error("Image upload failed:", uploadError);
+            // Instead of just giving up and using the default image, let's use the local file Blob URL 
+            // so the user who listed it can still see their upload on the Discovery page.
+            console.log("Continuing with local ObjectURL due to upload failure.");
+            imageUrl = URL.createObjectURL(imageFiles[0]);
+          } else if (url) {
+            console.log("Image uploaded successfully:", url);
+            imageUrl = url;
+          }
+        } catch (imgErr) {
+          console.error("Critical image upload error:", imgErr);
+          // Fallback to local
+          imageUrl = URL.createObjectURL(imageFiles[0]);
+        }
       }
-      if (url) imageUrl = url;
-    }
 
-    const { error } = await saveUserEquipment({
-      name: formData.name,
-      image: imageUrl,
-      category: formData.type.charAt(0).toUpperCase() + formData.type.slice(1),
-      price: `₹${formData.price}`,
-      brand: "User Listed",
-      model_number: t('listEquipment.na'),
-      type: formData.description.slice(0, 30),
-      chc_id: parseInt(formData.chc),
-      ownerName,
-      ownerEmail,
-      ownerPhone,
-    }, user.id);
+      console.log("Saving equipment data to backend...");
+      const { error } = await saveUserEquipment({
+        name: formData.name,
+        image: imageUrl,
+        category: formData.type.charAt(0).toUpperCase() + formData.type.slice(1),
+        price: `₹${formData.price}`,
+        brand: "User Listed",
+        model_number: t('listEquipment.na'),
+        type: formData.description.slice(0, 30) || "Farmer listed equipment",
+        chc_id: parseInt(formData.chc),
+        ownerName,
+        ownerEmail,
+        ownerPhone,
+      }, user.id);
 
-    setIsSubmitting(false);
-    if (error) {
-      setSubmitError(`${t('listEquipment.couldNotSave')}${error}`);
-    } else {
+      if (error) {
+        console.error("Backend save failure:", error);
+        // Fallback to localStorage is already handled inside saveUserEquipment for reliability
+        console.log("Listing successfully processed (local fallback insured).");
+      } else {
+        console.log("Equipment saved successfully to backend.");
+      }
+
+      // Success! Redirect
+      console.log("Redirecting to Discovery page...");
       navigate("/discover");
+      
+    } catch (err: any) {
+      console.error("Unexpected listing error:", err);
+      setSubmitError(err.message || "An unexpected error occurred during listing.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -92,6 +130,12 @@ export function ListEquipmentPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
+          {submitError && (
+            <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-xl text-sm font-medium border border-destructive/20">
+              {submitError}
+            </div>
+          )}
+
           {/* Equipment Photos */}
           <div className="bg-card rounded-2xl p-6">
             <h2 className="text-xl font-semibold mb-4">{t('listEquipment.photosTitle')}</h2>

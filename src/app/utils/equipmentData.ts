@@ -39,6 +39,16 @@ export interface RentalRequest {
   createdAt: string;           // created_at
 }
 
+export interface EquipmentReview {
+  id: string;
+  equipmentId: number;
+  userId?: string;
+  userName: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+}
+
 // ─── Hardcoded Equipment (always shown, from CHC centers) ──────────
 export const EQUIPMENT_LIST: Equipment[] = [
   {
@@ -95,7 +105,7 @@ export const EQUIPMENT_LIST: Equipment[] = [
   },
   {
     id: 401, name: "Fieldking Rotary Tiller",
-    image: "https://images.unsplash.com/photo-1592982537447-7440770cbdi?fit=crop&q=80&w=800",
+    image: "/images/fieldking_rotary_tiller.png",
     distance: "9 km away", price: "₹450", available: true, category: "Rotavator",
     brand: "Fieldking", model_number: "FKRTMG-145", type: "Rotary Tiller", chc_id: 20,
     ownerName: "Anjali Hegde", ownerEmail: "anjali@dalasanuru.in",
@@ -103,7 +113,7 @@ export const EQUIPMENT_LIST: Equipment[] = [
   },
   {
     id: 402, name: "Fieldking Heavy Duty Rotavator",
-    image: "https://images.unsplash.com/photo-1592982537447-7440770cbdi?fit=crop&q=80&w=800",
+    image: "/images/fieldking_heavy_duty_rotavator.png",
     distance: "14 km away", price: "₹550", available: true, category: "Rotavator",
     brand: "Fieldking", model_number: "FKRTMG-175",
     type: "Heavy Duty Rotavator", chc_id: 14,
@@ -155,37 +165,63 @@ function rowToRequest(row: any): RentalRequest {
 
 // ─── Equipment API ─────────────────────────────────────────────────
 
-/** Save a new equipment listing to Supabase */
+const LOCAL_STORAGE_KEY = "hasiru_user_listings";
+
+/** Save a new equipment listing to Supabase (and localStorage as fallback) */
 export async function saveUserEquipment(
   equipment: Omit<Equipment, "id" | "available" | "distance">,
   userId: string
 ): Promise<{ error: string | null }> {
-  const { error } = await supabase.from("equipment").insert({
-    name: equipment.name,
-    image: equipment.image,
-    price: equipment.price,
-    category: equipment.category,
-    available: true,
-    distance: "Nearby",
-    brand: equipment.brand,
-    model_number: equipment.model_number,
-    equipment_type: equipment.type,
-    chc_id: equipment.chc_id,
-    owner_name: equipment.ownerName,
-    owner_email: equipment.ownerEmail,
-    owner_phone: equipment.ownerPhone,
-    owner_user_id: userId,
-  });
-  return { error: error?.message || null };
-}
+  console.log("Saving equipment:", equipment);
+  
+  // 1. First try Supabase
+  let supabaseError = null;
+  try {
+    const { error } = await supabase.from("equipment").insert({
+      name: equipment.name,
+      image: equipment.image,
+      price: equipment.price,
+      category: equipment.category,
+      available: true,
+      distance: "Nearby",
+      brand: equipment.brand,
+      model_number: equipment.model_number,
+      equipment_type: equipment.type,
+      chc_id: equipment.chc_id,
+      owner_name: equipment.ownerName,
+      owner_email: equipment.ownerEmail,
+      owner_phone: equipment.ownerPhone,
+      owner_user_id: userId,
+    });
+    if (error) {
+      console.error("Supabase insert error:", error.message);
+      supabaseError = error.message;
+    }
+  } catch (err: any) {
+    console.error("Supabase exception caught during insert:", err);
+    supabaseError = err.message || "Unknown database error";
+  }
 
-/** Fetch user-listed equipment from Supabase (high IDs go first) */
-export async function getUserEquipment(chcId?: number): Promise<Equipment[]> {
-  let query = supabase.from("equipment").select("*").order("created_at", { ascending: false });
-  if (chcId) query = query.eq("chc_id", chcId);
-  const { data, error } = await query;
-  if (error || !data) return [];
-  return data.map(rowToEquipment);
+  // 2. Always save to localStorage as well (per user request for reliability)
+  try {
+    const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
+    const listings: Equipment[] = localData ? JSON.parse(localData) : [];
+    const newId = -Date.now(); // Use negative ID to avoid collision with Supabase serials
+    const newListing: Equipment = {
+      ...equipment,
+      id: newId,
+      available: true,
+      distance: "Nearby",
+      created_at: new Date().toISOString()
+    };
+    listings.unshift(newListing); // Add to front
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(listings));
+    console.log("Saved to localStorage successfully as fallback.");
+  } catch (lsError) {
+    console.error("LocalStorage save error:", lsError);
+  }
+
+  return { error: supabaseError };
 }
 
 /** Fetch equipment by owner email */
@@ -199,13 +235,65 @@ export async function getEquipmentByOwner(ownerEmail: string): Promise<Equipment
   return data.map(rowToEquipment);
 }
 
-/** Merge Supabase user listings + hardcoded list, filtered by CHC */
+/** Fetch user-listed equipment from Supabase */
+export async function getSupabaseEquipment(chcId?: number): Promise<Equipment[]> {
+  try {
+    let query = supabase.from("equipment").select("*").order("created_at", { ascending: false });
+    if (chcId) query = query.eq("chc_id", chcId);
+    const { data, error } = await query;
+    if (error || !data) {
+      console.warn("Could not fetch from Supabase:", error?.message);
+      return [];
+    }
+    return data.map(rowToEquipment);
+  } catch (e) {
+    console.error("Supabase fetch exception:", e);
+    return [];
+  }
+}
+
+/** Fetch user-listed equipment from LocalStorage */
+export function getLocalEquipment(chcId?: number): Equipment[] {
+  try {
+    const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!localData) return [];
+    let listings: Equipment[] = JSON.parse(localData);
+    if (chcId) {
+      listings = listings.filter(e => e.chc_id === chcId);
+    }
+    return listings;
+  } catch (e) {
+    console.error("LocalStorage fetch exception:", e);
+    return [];
+  }
+}
+
+/** Merge all sources: Supabase + LocalStorage + Hardcoded */
 export async function getAllEquipment(chcId?: number): Promise<Equipment[]> {
-  const dbEquipment = await getUserEquipment(chcId);
+  console.log("Fetching all equipment for CHC:", chcId);
+  
+  const [supabaseList, localList] = await Promise.all([
+    getSupabaseEquipment(chcId),
+    Promise.resolve(getLocalEquipment(chcId))
+  ]);
+
+  // Merge dynamic lists
+  const dynamicList = [...localList, ...supabaseList];
+  
+  // Remove duplicates by ID (if someone saved to both and we fetched both)
+  const seenIds = new Set();
+  const uniqueDynamic = dynamicList.filter(item => {
+    if (seenIds.has(item.id)) return false;
+    seenIds.add(item.id);
+    return true;
+  });
+
   const hardcoded = chcId
     ? EQUIPMENT_LIST.filter(e => e.chc_id === chcId)
     : EQUIPMENT_LIST;
-  return [...dbEquipment, ...hardcoded];
+
+  // Newest user listings first, then hardcoded
+  return [...uniqueDynamic, ...hardcoded];
 }
 
 /** Get a single equipment item by ID */
@@ -269,6 +357,45 @@ export async function updateRequestStatus(
     .from("rental_requests")
     .update({ status })
     .eq("id", requestId);
+}
+
+// ─── Review API ───────────────────────────────────────────────────
+
+function rowToReview(row: any): EquipmentReview {
+  return {
+    id: row.id,
+    equipmentId: row.equipment_id,
+    userId: row.user_id,
+    userName: row.user_name,
+    rating: row.rating,
+    comment: row.comment,
+    createdAt: row.created_at,
+  };
+}
+
+/** Fetch all reviews for a specific equipment */
+export async function getEquipmentReviews(equipmentId: number): Promise<EquipmentReview[]> {
+  const { data, error } = await supabase
+    .from("equipment_reviews")
+    .select("*")
+    .eq("equipment_id", equipmentId)
+    .order("created_at", { ascending: false });
+  if (error || !data) return [];
+  return data.map(rowToReview);
+}
+
+/** Add a new review */
+export async function addEquipmentReview(
+  review: Omit<EquipmentReview, "id" | "createdAt">
+): Promise<{ error: string | null }> {
+  const { error } = await supabase.from("equipment_reviews").insert({
+    equipment_id: review.equipmentId,
+    user_id: review.userId,
+    user_name: review.userName,
+    rating: review.rating,
+    comment: review.comment,
+  });
+  return { error: error?.message || null };
 }
 
 // ─── Storage API ───────────────────────────────────────────────────

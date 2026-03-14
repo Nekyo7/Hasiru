@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router";
-import { MapPin, Star, Shield, Calendar, ArrowLeft, User, Loader2, Building2, Send, CheckCircle, Phone, XCircle } from "lucide-react";
+import { MapPin, Star, Shield, Calendar, ArrowLeft, User, Loader2, Building2, Send, CheckCircle, Phone, XCircle, MessageSquare, Star as StarSolid } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { Calendar as CalendarComponent } from "../components/ui/calendar";
-import { getAllEquipment, saveRentalRequest } from "../utils/equipmentData";
+import { getAllEquipment, saveRentalRequest, getEquipmentReviews, addEquipmentReview, type EquipmentReview } from "../utils/equipmentData";
 import { useAuth } from "../contexts/AuthContext";
-
 import { useLanguage } from "../contexts/LanguageContext";
 
 export function EquipmentDetailPage() {
@@ -17,12 +16,18 @@ export function EquipmentDetailPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [hours, setHours] = useState(4);
   const [equipment, setEquipment] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isRequesting, setIsRequesting] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Review states
+  const [reviews, setReviews] = useState<EquipmentReview[]>([]);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(true);
+  const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   const userMeta = user?.user_metadata || {};
   const userName: string = userMeta.name || userMeta.full_name || user?.email?.split("@")[0] || t('equipmentDetail.farmer');
@@ -30,13 +35,45 @@ export function EquipmentDetailPage() {
 
   useEffect(() => {
     if (!id) return;
-    async function load() {
+    async function loadData() {
+      setIsLoading(true);
       const all = await getAllEquipment();
       const found = all.find(e => e.id === parseInt(id!));
-      if (found) setEquipment(found);
+      if (found) {
+        setEquipment(found);
+        // Load reviews
+        const reviewData = await getEquipmentReviews(found.id);
+        setReviews(reviewData);
+      }
+      setIsLoading(false);
+      setIsLoadingReviews(false);
     }
-    load();
+    loadData();
+    window.scrollTo(0, 0);
   }, [id]);
+
+  const handlePostReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !id || !equipment) return;
+    
+    setIsSubmittingReview(true);
+    const { error } = await addEquipmentReview({
+      equipmentId: equipment.id,
+      userId: user.id,
+      userName: userName,
+      rating: newReview.rating,
+      comment: newReview.comment,
+    });
+
+    if (!error) {
+      setNewReview({ rating: 5, comment: "" });
+      const updatedReviews = await getEquipmentReviews(equipment.id);
+      setReviews(updatedReviews);
+    } else {
+      setSubmitError("Failed to post review: " + error);
+    }
+    setIsSubmittingReview(false);
+  };
 
   const handleRequestBooking = async () => {
     if (!isAuthenticated) {
@@ -50,8 +87,8 @@ export function EquipmentDetailPage() {
 
     try {
       const selectedDate = date ? date.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) : "TBD";
-      const priceNum = parseInt(equipment.price.replace(/[^\d]/g, "")) || 0;
-      const total = `₹${priceNum * hours}`;
+      const priceVal = parseInt(equipment.price.replace(/[^\d]/g, "")) || 0;
+      const total = `₹${priceVal * hours}`;
 
       const { error } = await saveRentalRequest({
         equipmentId: equipment.id,
@@ -323,6 +360,118 @@ export function EquipmentDetailPage() {
                     <span>{t('equipmentDetail.verifiedOwner')}</span>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="mt-12 pt-12 border-t border-border">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <MessageSquare className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold">Reviews & Ratings</h2>
+              <p className="text-sm text-muted-foreground">{reviews.length} total reviews</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            {/* Review List */}
+            <div className="lg:col-span-2 space-y-6">
+              {isLoadingReviews ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                </div>
+              ) : reviews.length === 0 ? (
+                <div className="bg-muted/30 rounded-2xl p-12 text-center">
+                  <p className="text-muted-foreground">No reviews yet. Be the first to share your experience!</p>
+                </div>
+              ) : (
+                reviews.map((review) => (
+                  <div key={review.id} className="bg-card rounded-2xl p-6 border border-border/50">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h4 className="font-bold">{review.userName}</h4>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(review.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="flex gap-0.5">
+                        {[...Array(5)].map((_, i) => (
+                          <StarSolid
+                            key={i}
+                            className={`w-3.5 h-3.5 ${
+                              i < review.rating ? "text-amber-400 fill-amber-400" : "text-muted/30"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-sm text-foreground/80 leading-relaxed italic">
+                      "{review.comment}"
+                    </p>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Leave a Review Form */}
+            <div className="lg:col-span-1">
+              <div className="bg-primary/5 rounded-3xl p-8 border border-primary/10 sticky top-24">
+                <h3 className="text-lg font-bold mb-4">Leave a Review</h3>
+                {isAuthenticated ? (
+                  <form onSubmit={handlePostReview} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Rating</label>
+                      <div className="flex gap-2">
+                        {[1, 2, 3, 4, 5].map((num) => (
+                          <button
+                            key={num}
+                            type="button"
+                            onClick={() => setNewReview({ ...newReview, rating: num })}
+                            className="focus:outline-none transition-transform active:scale-90"
+                          >
+                            <StarSolid
+                              className={`w-8 h-8 ${
+                                num <= newReview.rating ? "text-amber-400 fill-amber-400" : "text-muted"
+                              }`}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Comment</label>
+                      <textarea
+                        required
+                        value={newReview.comment}
+                        onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+                        className="w-full px-4 py-3 bg-background rounded-xl border border-border focus:ring-2 focus:ring-primary outline-none resize-none text-sm"
+                        placeholder="Share your experience with this equipment..."
+                        rows={4}
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={isSubmittingReview}
+                      className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-bold hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {isSubmittingReview ? <Loader2 className="w-4 h-4 animate-spin" /> : "Post Review"}
+                    </button>
+                  </form>
+                ) : (
+                  <div className="text-center space-y-4">
+                    <p className="text-sm text-muted-foreground">Please log in to leave a review.</p>
+                    <Link
+                      to="/login"
+                      className="inline-block w-full bg-primary text-primary-foreground py-3 rounded-xl font-bold"
+                    >
+                      Log In
+                    </Link>
+                  </div>
+                )}
               </div>
             </div>
           </div>

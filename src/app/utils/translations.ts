@@ -276,7 +276,22 @@ export const translations = {
       pleaseLogin: "Please Login",
       signinToView: "Sign in to view your profile",
       owner: "Owner",
-      available: "Available"
+      available: "Available",
+      table: {
+        machine: "Machine",
+        category: "Category",
+        priceHr: "Price/hr",
+        status: "Status",
+        requester: "Requester",
+        contact: "Contact",
+        bookingDetails: "Booking Details",
+        actions: "Actions",
+        owner: "Owner",
+        dateHours: "Date & Hours",
+        billAmount: "Bill Amount",
+        noPhone: "No phone",
+        hrsAt: "hrs @"
+      }
     }
   },
   kn: {
@@ -554,7 +569,22 @@ export const translations = {
       pleaseLogin: "ದಯವಿಟ್ಟು ಲಾಗಿನ್ ಮಾಡಿ",
       signinToView: "ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ವೀಕ್ಷಿಸಲು ಸೈನ್ ಇನ್ ಮಾಡಿ",
       owner: "ಮಾಲೀಕರು",
-      available: "ಲಭ್ಯವಿದೆ"
+      available: "ಲಭ್ಯವಿದೆ",
+      table: {
+        machine: "ಯಂತ್ರ",
+        category: "ವರ್ಗ",
+        priceHr: "ಬೆಲೆ/ಗಂಟೆಗೆ",
+        status: "ಸ್ಥಿತಿ",
+        requester: "ವಿನಂತಿಸಿದವರು",
+        contact: "ಸಂಪರ್ಕ",
+        bookingDetails: "ಬುಕಿಂಗ್ ವಿವರಗಳು",
+        actions: "ಕ್ರಮಗಳು",
+        owner: "ಮಾಲೀಕರು",
+        dateHours: "ದಿನಾಂಕ ಮತ್ತು ಗಂಟೆಗಳು",
+        billAmount: "ಬಿಲ್ ಮೊತ್ತ",
+        noPhone: "ಫೋನ್ ಇಲ್ಲ",
+        hrsAt: "ಗಂಟೆಗಳು @"
+      }
     }
   }
 };

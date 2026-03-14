@@ -223,9 +223,9 @@ export function ProfilePage() {
 
         {/* Tab: My Equipment */}
         {activeTab === "equipment" && (
-          <div>
+          <div className="bg-card rounded-2xl border border-border overflow-hidden">
             {myEquipment.length === 0 ? (
-              <div className="text-center py-16 bg-card rounded-2xl border border-border">
+              <div className="text-center py-16">
                 <Package className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-xl font-semibold mb-2">{t('profile.noEquipListed')}</h3>
                 <p className="text-muted-foreground mb-6">{t('profile.shareMachinery')}</p>
@@ -237,26 +237,40 @@ export function ProfilePage() {
                 </Link>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {myEquipment.map(eq => (
-                  <div key={eq.id} className="bg-card rounded-2xl overflow-hidden border border-border flex">
-                    <div className="w-1/3 aspect-square overflow-hidden flex-shrink-0">
-                      <ImageWithFallback
-                        src={eq.image}
-                        alt={eq.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 p-4">
-                      <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">{t(`discovery.types.${eq.category?.toLowerCase()}`) || eq.category}</span>
-                      <h3 className="font-semibold mt-1 mb-1">{eq.name}</h3>
-                      <p className="text-sm font-bold text-primary">{eq.price}<span className="text-muted-foreground font-normal">/{t('dashboard.hr')}</span></p>
-                      <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                        <CheckCircle className="w-3 h-3 text-green-500" /> {t('profile.available')}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-muted/50 border-b border-border">
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.machine')}</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.category')}</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.priceHr')}</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.status')}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {myEquipment.map(eq => (
+                      <tr key={eq.id} className="hover:bg-muted/30 transition-colors">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 border border-border">
+                              <ImageWithFallback src={eq.image} alt={eq.name} className="w-full h-full object-cover" />
+                            </div>
+                            <span className="font-semibold text-foreground">{eq.name}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-sm">
+                          <span className="bg-primary/10 text-primary px-2.5 py-1 rounded-full text-xs font-semibold">{eq.category}</span>
+                        </td>
+                        <td className="px-6 py-4 text-sm font-bold text-primary">{eq.price}</td>
+                        <td className="px-6 py-4 text-sm">
+                          <div className="flex items-center gap-1.5 text-green-600 font-medium">
+                            <CheckCircle className="w-4 h-4" /> {t('profile.available')}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
@@ -264,64 +278,82 @@ export function ProfilePage() {
 
         {/* Tab: Requests Received */}
         {activeTab === "received" && (
-          <div className="space-y-4">
+          <div className="bg-card rounded-2xl border border-border overflow-hidden">
             {receivedRequests.length === 0 ? (
-              <div className="text-center py-16 bg-card rounded-2xl border border-border">
+              <div className="text-center py-16">
                 <Star className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-xl font-semibold mb-2">{t('profile.noRequestsYet')}</h3>
                 <p className="text-muted-foreground">{t('profile.farmersWillSend')}</p>
               </div>
             ) : (
-              receivedRequests.map(req => (
-                <div key={req.id} className="bg-card rounded-2xl p-5 border border-border">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h3 className="font-semibold">{req.equipmentName}</h3>
-                      <p className="text-sm text-muted-foreground">{t('profile.requestedBy')} <span className="font-medium text-foreground">{req.requesterName}</span></p>
-                      {req.requesterPhone && (
-                        <a
-                          href={`tel:${req.requesterPhone}`}
-                          className="inline-flex items-center gap-1.5 mt-1 text-sm text-primary hover:underline font-medium"
-                        >
-                          <Phone className="w-3.5 h-3.5" />
-                          {req.requesterPhone}
-                        </a>
-                      )}
-                    </div>
-                    {statusBadge(req.status)}
-                  </div>
-                  <div className="flex gap-4 text-sm text-muted-foreground mb-4">
-                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {req.date}</span>
-                    <span>{req.hours} {t('dashboard.hours')}</span>
-                    <span className="font-semibold text-foreground">{req.totalPrice}</span>
-                  </div>
-                  {req.status === "pending" && (
-                    <div className="flex gap-3">
-                      <button
-                        onClick={() => handleUpdateStatus(req.id, "accepted")}
-                        className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity"
-                      >
-                        <CheckCircle className="w-4 h-4" /> {t('profile.accept')}
-                      </button>
-                      <button
-                        onClick={() => handleUpdateStatus(req.id, "declined")}
-                        className="flex-1 flex items-center justify-center gap-2 bg-muted text-foreground py-2.5 rounded-xl text-sm font-semibold hover:bg-muted/80 transition-colors"
-                      >
-                        <XCircle className="w-4 h-4" /> {t('profile.decline')}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-muted/50 border-b border-border">
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.machine')} & {t('profile.table.requester')}</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.contact')}</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.bookingDetails')}</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.actions')}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {receivedRequests.map(req => (
+                      <tr key={req.id} className="hover:bg-muted/30 transition-colors">
+                        <td className="px-6 py-4">
+                          <h4 className="font-bold text-foreground">{req.equipmentName}</h4>
+                          <p className="text-sm text-muted-foreground">{t('profile.requestedBy')}: <span className="font-medium">{req.requesterName}</span></p>
+                        </td>
+                        <td className="px-6 py-4">
+                          {req.requesterPhone ? (
+                            <a href={`tel:${req.requesterPhone}`} className="inline-flex items-center gap-2 text-primary hover:underline font-semibold text-sm">
+                              <Phone className="w-4 h-4" /> {req.requesterPhone}
+                            </a>
+                          ) : (
+                            <span className="text-muted-foreground text-sm italic">{t('profile.table.noPhone')}</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-sm">
+                          <div className="flex flex-col gap-0.5">
+                            <span className="flex items-center gap-1 font-medium"><Clock className="w-3.5 h-3.5" /> {req.date}</span>
+                            <span className="text-muted-foreground">{req.hours} {t('profile.table.hrsAt')} <span className="font-bold text-foreground">{req.totalPrice}</span></span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          {req.status === "pending" ? (
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleUpdateStatus(req.id, "accepted")}
+                                className="bg-primary text-primary-foreground p-2 rounded-lg hover:opacity-90 transition-opacity"
+                                title="Accept"
+                              >
+                                <CheckCircle className="w-5 h-5" />
+                              </button>
+                              <button
+                                onClick={() => handleUpdateStatus(req.id, "declined")}
+                                className="bg-muted text-foreground p-2 rounded-lg hover:bg-muted/80 transition-colors"
+                                title="Decline"
+                              >
+                                <XCircle className="w-5 h-5" />
+                              </button>
+                            </div>
+                          ) : (
+                            statusBadge(req.status)
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         )}
 
         {/* Tab: Requests Sent */}
         {activeTab === "sent" && (
-          <div className="space-y-4">
+          <div className="bg-card rounded-2xl border border-border overflow-hidden">
             {sentRequests.length === 0 ? (
-              <div className="text-center py-16 bg-card rounded-2xl border border-border">
+              <div className="text-center py-16">
                 <Clock className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-xl font-semibold mb-2">{t('profile.noRequestsSent')}</h3>
                 <p className="text-muted-foreground mb-6">{t('profile.browseAndSend')}</p>
@@ -333,29 +365,42 @@ export function ProfilePage() {
                 </Link>
               </div>
             ) : (
-              sentRequests.map(req => (
-                <div key={req.id} className="bg-card rounded-2xl p-5 border border-border flex gap-4 items-start">
-                  <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
-                    <ImageWithFallback
-                      src={req.equipmentImage}
-                      alt={req.equipmentName}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between">
-                      <h3 className="font-semibold">{req.equipmentName}</h3>
-                      {statusBadge(req.status)}
-                    </div>
-                    <p className="text-sm text-muted-foreground">{t('profile.owner')}: <span className="font-medium text-foreground">{req.ownerName}</span></p>
-                    <div className="flex gap-4 text-sm text-muted-foreground mt-1">
-                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {req.date}</span>
-                      <span>{req.hours} {t('dashboard.hours')}</span>
-                      <span className="font-bold text-foreground">{req.totalPrice}</span>
-                    </div>
-                  </div>
-                </div>
-              ))
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-muted/50 border-b border-border">
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.machine')}</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.owner')}</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.dateHours')}</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.billAmount')}</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.status')}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {sentRequests.map(req => (
+                      <tr key={req.id} className="hover:bg-muted/30 transition-colors text-sm">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 border border-border">
+                              <ImageWithFallback src={req.equipmentImage} alt={req.equipmentName} className="w-full h-full object-cover" />
+                            </div>
+                            <span className="font-bold">{req.equipmentName}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-muted-foreground">{req.ownerName}</td>
+                        <td className="px-6 py-4">
+                          <span className="flex items-center gap-1 font-medium"><Clock className="w-3.5 h-3.5" /> {req.date}</span>
+                          <span className="text-xs text-muted-foreground">{req.hours} {t('dashboard.hours')}</span>
+                        </td>
+                        <td className="px-6 py-4 font-bold text-primary">{req.totalPrice}</td>
+                        <td className="px-6 py-4">
+                          {statusBadge(req.status) || <span className="text-muted-foreground">{t('dashboard.status.pending')}</span>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         )}
