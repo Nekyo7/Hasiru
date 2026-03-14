@@ -1,18 +1,20 @@
 import { useRouteError, useNavigate, isRouteErrorResponse } from "react-router";
 import { AlertTriangle, Home, ArrowLeft } from "lucide-react";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export function ErrorPage() {
   const error = useRouteError();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
-  let title = "Unexpected Error";
-  let message = "An unexpected error occurred.";
+  let title = t('errorPage.unexpectedError');
+  let message = t('errorPage.unexpectedOccurred');
   let status = 500;
 
   if (isRouteErrorResponse(error)) {
     status = error.status;
-    title = `${error.status} ${error.statusText || "Oops!"}`;
-    message = error.data?.message || error.data || "The page you are looking for does not exist or an error occurred.";
+    title = `${error.status} ${error.statusText || t('errorPage.oops')}`;
+    message = error.data?.message || error.data || t('errorPage.notExistMessage');
   } else if (error instanceof Error) {
     message = error.message;
   }
@@ -37,19 +39,19 @@ export function ErrorPage() {
             className="flex items-center justify-center gap-2 px-6 py-2.5 border border-input rounded-lg text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Go Back
+            {t('errorPage.goBack')}
           </button>
           <button
             onClick={() => navigate("/")}
             className="flex items-center justify-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
           >
             <Home className="w-4 h-4" />
-            Go Home
+            {t('errorPage.goHome')}
           </button>
         </div>
         {status === 404 && (
           <p className="text-xs text-muted-foreground mt-8">
-            Please check the URL or navigate back to the home page to find what you're looking for.
+            {t('errorPage.checkUrlDetails')}
           </p>
         )}
       </div>

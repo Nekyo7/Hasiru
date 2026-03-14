@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { Mail, Phone, MapPin, User, ArrowRight, Loader2 } from "lucide-react";
 import { selectCHC } from "../utils/auth";
 import { supabase } from "../../lib/supabase";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const CHC_LOCATIONS = [
   "gkvk",
@@ -13,6 +14,7 @@ const CHC_LOCATIONS = [
 
 export function SignUpPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -109,8 +111,8 @@ export function SignUpPage() {
         <div className="bg-card rounded-2xl shadow-lg p-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">Join Hasiru</h1>
-            <p className="text-muted-foreground">Start renting equipment from your nearest CHC</p>
+            <h1 className="text-3xl font-bold text-foreground mb-2">{t('auth.joinHasiru')}</h1>
+            <p className="text-muted-foreground">{t('auth.joinSubtitle')}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -119,7 +121,7 @@ export function SignUpPage() {
               <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
                 <div className="flex items-center gap-2">
                   <User className="w-4 h-4" />
-                  Full Name
+                  {t('auth.fullName')}
                 </div>
               </label>
               <input
@@ -128,7 +130,7 @@ export function SignUpPage() {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="Enter your full name"
+                placeholder={t('auth.namePlaceholder')}
                 className="w-full px-4 py-3 bg-input-background rounded-xl border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition"
               />
               {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
@@ -139,7 +141,7 @@ export function SignUpPage() {
               <label htmlFor="phone" className="block text-sm font-medium text-foreground mb-2">
                 <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4" />
-                  Phone Number
+                  {t('auth.phoneNumber')}
                 </div>
               </label>
               <input
@@ -148,7 +150,7 @@ export function SignUpPage() {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                placeholder="Enter 10-digit phone number"
+                placeholder={t('auth.phonePlaceholderSignup')}
                 className="w-full px-4 py-3 bg-input-background rounded-xl border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition"
               />
               {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
@@ -159,7 +161,7 @@ export function SignUpPage() {
               <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4" />
-                  Email
+                  {t('auth.emailAddress')}
                 </div>
               </label>
               <input
@@ -168,7 +170,7 @@ export function SignUpPage() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="Enter your email"
+                placeholder={t('auth.emailPlaceholderSignup')}
                 className="w-full px-4 py-3 bg-input-background rounded-xl border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition"
               />
               {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
@@ -179,7 +181,7 @@ export function SignUpPage() {
               <label htmlFor="address" className="block text-sm font-medium text-foreground mb-2">
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4" />
-                  Address
+                  {t('auth.address')}
                 </div>
               </label>
               <input
@@ -188,7 +190,7 @@ export function SignUpPage() {
                 name="address"
                 value={formData.address}
                 onChange={handleChange}
-                placeholder="Enter your complete address"
+                placeholder={t('auth.addressPlaceholder')}
                 className="w-full px-4 py-3 bg-input-background rounded-xl border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition"
               />
               {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
@@ -199,7 +201,7 @@ export function SignUpPage() {
               <label htmlFor="location" className="block text-sm font-medium text-foreground mb-2">
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4" />
-                  Nearest CHC Location
+                  {t('auth.nearestChc')}
                 </div>
               </label>
               <select
@@ -209,7 +211,7 @@ export function SignUpPage() {
                 onChange={handleChange}
                 className="w-full px-4 py-3 bg-input-background rounded-xl border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition"
               >
-                <option value="">Select a CHC location</option>
+                <option value="">{t('auth.selectChcLocation')}</option>
                 {CHC_LOCATIONS.map(location => (
                   <option key={location} value={location}>
                     {location}
@@ -234,11 +236,11 @@ export function SignUpPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Creating Account...</span>
+                  <span>{t('auth.creatingAccount')}</span>
                 </>
               ) : (
                 <>
-                  <span>Create Account</span>
+                  <span>{t('auth.createAccount')}</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -246,13 +248,13 @@ export function SignUpPage() {
 
             {/* Already signed up */}
             <p className="text-center text-sm text-muted-foreground">
-              Already have an account?{" "}
+              {t('auth.alreadyHaveAccount')}{" "}
               <button
                 type="button"
                 onClick={() => navigate("/login")}
                 className="text-primary hover:underline font-medium"
               >
-                Sign in
+                {t('auth.signIn')}
               </button>
             </p>
           </form>

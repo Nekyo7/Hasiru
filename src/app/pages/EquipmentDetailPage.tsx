@@ -6,9 +6,12 @@ import { Calendar as CalendarComponent } from "../components/ui/calendar";
 import { getAllEquipment, saveRentalRequest } from "../utils/equipmentData";
 import { useAuth } from "../contexts/AuthContext";
 
+import { useLanguage } from "../contexts/LanguageContext";
+
 export function EquipmentDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const { user, isAuthenticated } = useAuth();
   const [selectedImage, setSelectedImage] = useState(0);
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -87,9 +90,9 @@ export function EquipmentDetailPage() {
   if (!equipment) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center pt-16 bg-background">
-        <h2 className="text-2xl font-bold mb-4">Equipment Not Found</h2>
+        <h2 className="text-2xl font-bold mb-4">{t('equipmentDetail.notFound')}</h2>
         <Link to="/discover" className="text-primary hover:underline flex items-center gap-2">
-          <ArrowLeft className="w-4 h-4" /> Back to listings
+          <ArrowLeft className="w-4 h-4" /> {t('equipmentDetail.backToListings')}
         </Link>
       </div>
     );
@@ -105,12 +108,12 @@ export function EquipmentDetailPage() {
     ],
     description: `Well-maintained ${equipment.name}, perfect for plowing, tilling, and general farm work. Regularly serviced and in excellent working condition. Comes with standard attachments.`,
     specifications: {
-      "Engine Power": "42 HP",
-      "Fuel Type": "Diesel",
-      "Year": "2021",
-      "Condition": "Excellent",
-      "Hours Used": "850 hours",
-      "Transmission": "8 Forward + 2 Reverse"
+      [t('equipmentDetail.enginePower')]: "42 HP",
+      [t('equipmentDetail.fuelType')]: "Diesel",
+      [t('equipmentDetail.year')]: "2021",
+      [t('equipmentDetail.condition')]: "Excellent",
+      [t('equipmentDetail.hoursUsed')]: "850 hours",
+      [t('equipmentDetail.transmission')]: "8 Forward + 2 Reverse"
     },
   };
 
@@ -122,7 +125,7 @@ export function EquipmentDetailPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Link to="/discover" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors">
           <ArrowLeft className="w-4 h-4" />
-          Back to listings
+          {t('equipmentDetail.backToListings')}
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -148,13 +151,13 @@ export function EquipmentDetailPage() {
 
             {/* Description */}
             <div className="bg-card rounded-2xl p-6">
-              <h2 className="text-2xl font-semibold mb-4">About this equipment</h2>
+              <h2 className="text-2xl font-semibold mb-4">{t('equipmentDetail.aboutEquipment')}</h2>
               <p className="text-muted-foreground leading-relaxed">{details.description}</p>
             </div>
 
             {/* Specifications */}
             <div className="bg-card rounded-2xl p-6">
-              <h2 className="text-2xl font-semibold mb-4">Specifications</h2>
+              <h2 className="text-2xl font-semibold mb-4">{t('equipmentDetail.specifications')}</h2>
               <div className="grid grid-cols-2 gap-4">
                 {Object.entries(details.specifications).map(([key, value]) => (
                   <div key={key} className="border-b border-border pb-3">
@@ -167,7 +170,7 @@ export function EquipmentDetailPage() {
 
             {/* Owner Info */}
             <div className="bg-card rounded-2xl p-6">
-              <h2 className="text-2xl font-semibold mb-4">Equipment Owner</h2>
+              <h2 className="text-2xl font-semibold mb-4">{t('equipmentDetail.ownerTitle')}</h2>
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                   <span className="text-2xl font-bold text-primary">
@@ -183,11 +186,11 @@ export function EquipmentDetailPage() {
                     </div>
                     <div className="flex items-center gap-1">
                       <Building2 className="w-4 h-4" />
-                      <span>CHC Center</span>
+                      <span>{t('equipmentDetail.chcCenter')}</span>
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                    <User className="w-3 h-3" /> Verified owner
+                    <User className="w-3 h-3" /> {t('equipmentDetail.verifiedOwner')}
                   </p>
                   {equipment.ownerPhone ? (
                     <a
@@ -213,14 +216,14 @@ export function EquipmentDetailPage() {
               <div className="bg-card rounded-2xl p-6 shadow-lg">
                 <div className="flex items-baseline gap-2 mb-2">
                   <span className="text-4xl font-bold text-foreground">{equipment.price}</span>
-                  <span className="text-muted-foreground">/hour</span>
+                  <span className="text-muted-foreground">{t('discovery.perHour')}</span>
                 </div>
                 <div className="flex items-center gap-4 mb-4">
                   <div className="flex items-center gap-1">
                     <Star className="w-4 h-4 fill-secondary text-secondary" />
                     <span className="font-medium">{details.rating}</span>
                   </div>
-                  <span className="text-muted-foreground">({details.reviews} reviews)</span>
+                  <span className="text-muted-foreground">({details.reviews} {t('equipmentDetail.reviews')})</span>
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground mb-6">
                   <MapPin className="w-4 h-4" />
@@ -229,7 +232,7 @@ export function EquipmentDetailPage() {
 
                 {/* Hours selector */}
                 <div className="mb-4">
-                  <label className="text-sm font-medium text-foreground block mb-2">Duration (hours)</label>
+                  <label className="text-sm font-medium text-foreground block mb-2">{t('equipmentDetail.durationHours')}</label>
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => setHours(h => Math.max(1, h - 1))}
@@ -247,7 +250,7 @@ export function EquipmentDetailPage() {
                 <div className="mb-6">
                   <h3 className="font-semibold mb-3 flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
-                    Select booking date
+                    {t('equipmentDetail.selectDate')}
                   </h3>
                   <div className="bg-background rounded-xl p-2 border border-border/50">
                     <CalendarComponent
@@ -259,6 +262,19 @@ export function EquipmentDetailPage() {
                   </div>
                 </div>
 
+<<<<<<< HEAD
+                <div className="mb-6 flex items-start gap-2">
+                  <input
+                    type="checkbox"
+                    id="terms"
+                    checked={acceptedTerms}
+                    onChange={(e) => setAcceptedTerms(e.target.checked)}
+                    className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                  />
+                  <label htmlFor="terms" className="text-sm text-muted-foreground leading-tight cursor-pointer">
+                    {t('equipmentDetail.agreeTo')} <button type="button" className="text-primary hover:underline">{t('equipmentDetail.termsAndConditions')}</button> {t('equipmentDetail.rentingEquipment')}.
+                  </label>
+=======
                 {/* Terms and Conditions */}
                 <div className={`mb-6 p-4 rounded-xl border-2 transition-all ${acceptedTerms ? "border-green-500/30 bg-green-50/50" : "border-amber-500/30 bg-amber-50/50 shadow-[0_0_15px_rgba(245,158,11,0.1)]"}`}>
                   <div className="flex items-start gap-3">
@@ -279,6 +295,7 @@ export function EquipmentDetailPage() {
                       <p className="text-[10px] text-amber-700 uppercase tracking-wider font-extrabold">Requirement: Accept terms to book</p>
                     </div>
                   )}
+>>>>>>> 7798f18c844a95c234b09d3929509f2577f0d7c3
                 </div>
 
                 {submitError && (
@@ -291,7 +308,7 @@ export function EquipmentDetailPage() {
                 {requestSent ? (
                   <div className="w-full bg-green-100 text-green-800 py-4 rounded-xl font-semibold flex items-center justify-center gap-2">
                     <CheckCircle className="w-5 h-5" />
-                    Request Sent! Check your profile.
+                    {t('equipmentDetail.requestSent')}
                   </div>
                 ) : (
                   <button
@@ -300,12 +317,16 @@ export function EquipmentDetailPage() {
                     className="w-full bg-primary text-primary-foreground py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-70 disabled:grayscale flex items-center justify-center gap-2 relative overflow-hidden group"
                   >
                     {isRequesting ? (
-                      <><Loader2 className="w-5 h-5 animate-spin" /> Sending Request...</>
+                      <><Loader2 className="w-5 h-5 animate-spin" /> {t('equipmentDetail.sendingRequest')}</>
                     ) : (
+<<<<<<< HEAD
+                      <><Send className="w-5 h-5" /> {t('equipmentDetail.requestBooking')}</>
+=======
                       <>
                         <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /> 
                         Request Booking
                       </>
+>>>>>>> 7798f18c844a95c234b09d3929509f2577f0d7c3
                     )}
                   </button>
                 )}
@@ -313,11 +334,11 @@ export function EquipmentDetailPage() {
                 <div className="mt-4 pt-4 border-t border-border space-y-2">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Shield className="w-4 h-4" />
-                    <span>Equipment insured</span>
+                    <span>{t('equipmentDetail.insured')}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <User className="w-4 h-4" />
-                    <span>Verified owner</span>
+                    <span>{t('equipmentDetail.verifiedOwner')}</span>
                   </div>
                 </div>
               </div>

@@ -9,9 +9,11 @@ import {
   RentalRequest,
   Equipment
 } from "../utils/equipmentData";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export function DashboardPage() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [myEquipment, setMyEquipment] = useState<Equipment[]>([]);
   const [receivedRequests, setReceivedRequests] = useState<RentalRequest[]>([]);
 
@@ -45,7 +47,7 @@ export function DashboardPage() {
       declined: "bg-red-100 text-red-800"
     };
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${map[status] ?? ""}`}>{status}</span>
+      <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${map[status] ?? ""}`}>{t(`dashboard.status.${status}` as any) || status}</span>
     );
   };
 
@@ -53,8 +55,8 @@ export function DashboardPage() {
     <div className="min-h-screen pt-16 bg-background">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">Dashboard</h1>
-          <p className="text-lg text-muted-foreground">Manage your equipment and booking requests</p>
+          <h1 className="text-4xl font-bold text-foreground mb-2">{t('dashboard.title')}</h1>
+          <p className="text-lg text-muted-foreground">{t('dashboard.subtitle')}</p>
         </div>
 
         {/* Stats Grid */}
@@ -63,38 +65,38 @@ export function DashboardPage() {
             <div className="flex items-center justify-between mb-4">
               <TrendingUp className="w-8 h-8" />
             </div>
-            <p className="text-sm opacity-90 mb-1">Total Earnings</p>
+            <p className="text-sm opacity-90 mb-1">{t('dashboard.totalEarnings')}</p>
             <p className="text-3xl font-bold">
               ₹{acceptedRequests.reduce((sum, r) => sum + parseInt(r.totalPrice.replace(/[^\d]/g, "") || "0"), 0).toLocaleString("en-IN")}
             </p>
-            <p className="text-xs opacity-75 mt-2">From accepted requests</p>
+            <p className="text-xs opacity-75 mt-2">{t('dashboard.earningDesc')}</p>
           </div>
 
           <div className="bg-gradient-to-br from-secondary to-secondary/80 rounded-2xl p-6 text-secondary-foreground">
             <div className="flex items-center justify-between mb-4">
               <Package className="w-8 h-8" />
             </div>
-            <p className="text-sm opacity-90 mb-1">My Equipment</p>
+            <p className="text-sm opacity-90 mb-1">{t('dashboard.myEquipment')}</p>
             <p className="text-3xl font-bold">{myEquipment.length}</p>
-            <p className="text-xs opacity-75 mt-2">Listed for rent</p>
+            <p className="text-xs opacity-75 mt-2">{t('dashboard.equipDesc')}</p>
           </div>
 
           <div className="bg-gradient-to-br from-accent to-accent/80 rounded-2xl p-6 text-accent-foreground">
             <div className="flex items-center justify-between mb-4">
               <Bell className="w-8 h-8" />
             </div>
-            <p className="text-sm opacity-90 mb-1">Pending Requests</p>
+            <p className="text-sm opacity-90 mb-1">{t('dashboard.pendingRequests')}</p>
             <p className="text-3xl font-bold">{pendingRequests.length}</p>
-            <p className="text-xs opacity-75 mt-2">Awaiting your approval</p>
+            <p className="text-xs opacity-75 mt-2">{t('dashboard.pendingDesc')}</p>
           </div>
 
           <div className="bg-gradient-to-br from-[#8B9A87] to-[#6b7a67] rounded-2xl p-6 text-white">
             <div className="flex items-center justify-between mb-4">
               <CheckCircle className="w-8 h-8" />
             </div>
-            <p className="text-sm opacity-90 mb-1">Accepted Rentals</p>
+            <p className="text-sm opacity-90 mb-1">{t('dashboard.acceptedRentals')}</p>
             <p className="text-3xl font-bold">{acceptedRequests.length}</p>
-            <p className="text-xs opacity-75 mt-2">Total confirmed</p>
+            <p className="text-xs opacity-75 mt-2">{t('dashboard.acceptedDesc')}</p>
           </div>
         </div>
 
@@ -102,10 +104,9 @@ export function DashboardPage() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
 
-            {/* Booking Requests */}
             <div className="bg-card rounded-2xl p-6">
               <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
-                Booking Requests
+                {t('dashboard.bookingRequests')}
                 {pendingRequests.length > 0 && (
                   <span className="bg-primary text-primary-foreground text-sm font-bold w-7 h-7 rounded-full flex items-center justify-center">
                     {pendingRequests.length}
@@ -116,7 +117,7 @@ export function DashboardPage() {
               {receivedRequests.length === 0 ? (
                 <div className="text-center py-10 text-muted-foreground">
                   <Bell className="w-16 h-16 mx-auto mb-3 opacity-30" />
-                  <p>No booking requests yet. List your equipment to start receiving requests.</p>
+                  <p>{t('dashboard.noRequests')}</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -126,14 +127,14 @@ export function DashboardPage() {
                         <div>
                           <h3 className="font-semibold">{req.equipmentName}</h3>
                           <p className="text-sm text-muted-foreground">
-                            Requested by <span className="font-medium text-foreground">{req.requesterName}</span>
+                            {t('dashboard.requestedBy')} <span className="font-medium text-foreground">{req.requesterName}</span>
                           </p>
                         </div>
                         {statusBadge(req.status)}
                       </div>
                       <div className="flex gap-4 text-sm text-muted-foreground mb-3">
                         <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {req.date}</span>
-                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {req.hours} hours</span>
+                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {req.hours} {t('dashboard.hours')}</span>
                         <span className="font-bold text-foreground">{req.totalPrice}</span>
                       </div>
                       {req.status === "pending" && (
@@ -142,13 +143,13 @@ export function DashboardPage() {
                             onClick={() => handleUpdate(req.id, "accepted")}
                             className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity"
                           >
-                            <CheckCircle className="w-4 h-4" /> Accept
+                            <CheckCircle className="w-4 h-4" /> {t('dashboard.accept')}
                           </button>
                           <button
                             onClick={() => handleUpdate(req.id, "declined")}
                             className="flex-1 flex items-center justify-center gap-2 bg-muted text-foreground py-2 rounded-lg text-sm hover:bg-muted/80 transition-colors"
                           >
-                            <XCircle className="w-4 h-4" /> Decline
+                            <XCircle className="w-4 h-4" /> {t('dashboard.decline')}
                           </button>
                         </div>
                       )}
@@ -160,11 +161,11 @@ export function DashboardPage() {
 
             {/* My Equipment */}
             <div className="bg-card rounded-2xl p-6">
-              <h2 className="text-2xl font-semibold mb-6">My Equipment</h2>
+              <h2 className="text-2xl font-semibold mb-6">{t('dashboard.myEquipment')}</h2>
               {myEquipment.length === 0 ? (
                 <div className="text-center py-10 text-muted-foreground">
                   <Package className="w-16 h-16 mx-auto mb-3 opacity-30" />
-                  <p>No equipment listed yet.</p>
+                  <p>{t('dashboard.noEquipment')}</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -176,10 +177,10 @@ export function DashboardPage() {
                       <div className="flex-1">
                         <h3 className="font-semibold text-lg mb-1">{equipment.name}</h3>
                         <p className="text-sm text-muted-foreground">{equipment.category}</p>
-                        <p className="text-sm text-primary font-semibold mt-1">{equipment.price}/hr</p>
+                        <p className="text-sm text-primary font-semibold mt-1">{equipment.price}{t('dashboard.hr')}</p>
                       </div>
                       <div className="text-right">
-                        <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-semibold">Available</span>
+                        <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-semibold">{t('dashboard.availableBadge')}</span>
                       </div>
                     </div>
                   ))}
@@ -191,22 +192,22 @@ export function DashboardPage() {
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-card rounded-2xl p-6 sticky top-24">
-              <h2 className="text-2xl font-semibold mb-6">Quick Stats</h2>
+              <h2 className="text-2xl font-semibold mb-6">{t('dashboard.quickStats')}</h2>
               <div className="space-y-5">
                 <div className="border-b border-border pb-5">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Pending Requests</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">{t('dashboard.pendingRequests')}</p>
                   <p className="text-3xl font-bold text-primary">{pendingRequests.length}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Awaiting your decision</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('dashboard.awaitingDecision')}</p>
                 </div>
                 <div className="border-b border-border pb-5">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Accepted</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">{t('dashboard.status.accepted')}</p>
                   <p className="text-3xl font-bold text-secondary">{acceptedRequests.length}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Confirmed rentals</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('dashboard.confirmedRentals')}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">My Listings</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">{t('dashboard.myListings')}</p>
                   <p className="text-3xl font-bold text-accent">{myEquipment.length}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Equipment available</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('dashboard.equipAvailable')}</p>
                 </div>
               </div>
             </div>

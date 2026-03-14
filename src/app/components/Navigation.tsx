@@ -91,14 +91,14 @@ export function Navigation() {
                 >
                   <User className="w-4 h-4" />
                   <span className="hidden sm:inline text-sm truncate max-w-[100px]">
-                    {currentUser?.name || "Profile"}
+                    {currentUser?.name || t('nav.profile')}
                   </span>
                 </button>
                 {showDropdown && (
                   <div className="absolute right-0 mt-2 w-56 bg-card rounded-lg shadow-lg border border-border overflow-hidden z-10">
                     {/* User Info */}
                     <div className="px-4 py-3 bg-muted/50 border-b border-border">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide">Logged in as</p>
+                      <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('nav.loggedInAs')}</p>
                       <p className="font-semibold text-foreground text-sm truncate">{currentUser?.name}</p>
                       <p className="text-xs text-muted-foreground truncate">{currentUser?.email}</p>
                     </div>
@@ -110,7 +110,7 @@ export function Navigation() {
                       onClick={() => setShowDropdown(false)}
                     >
                       <UserCircle className="w-4 h-4" />
-                      My Profile
+                      {t('nav.myProfile')}
                     </Link>
                     <Link
                       to="/dashboard"

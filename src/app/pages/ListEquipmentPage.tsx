@@ -4,9 +4,11 @@ import { Upload, X, MapPin, IndianRupee, Store, CheckCircle2 } from "lucide-reac
 import { CHC_CENTERS } from "../utils/auth";
 import { saveUserEquipment } from "../utils/equipmentData";
 import { useAuth } from "../contexts/AuthContext";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export function ListEquipmentPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const { user } = useAuth();
   const userMeta = user?.user_metadata || {};
   const ownerName: string = userMeta.name || userMeta.full_name || user?.email?.split("@")[0] || "Farmer";
@@ -52,7 +54,7 @@ export function ListEquipmentPage() {
     if (imageFiles.length > 0) {
       const { url, error: uploadError } = await import("../utils/equipmentData").then(m => m.uploadEquipmentImage(imageFiles[0]));
       if (uploadError) {
-        setSubmitError(`Image upload failed: ${uploadError}`);
+        setSubmitError(`${t('listEquipment.imageUploadFailed')}${uploadError}`);
         setIsSubmitting(false);
         return;
       }
@@ -65,7 +67,7 @@ export function ListEquipmentPage() {
       category: formData.type.charAt(0).toUpperCase() + formData.type.slice(1),
       price: `₹${formData.price}`,
       brand: "User Listed",
-      model_number: "N/A",
+      model_number: t('listEquipment.na'),
       type: formData.description.slice(0, 30),
       chc_id: parseInt(formData.chc),
       ownerName,
@@ -75,7 +77,7 @@ export function ListEquipmentPage() {
 
     setIsSubmitting(false);
     if (error) {
-      setSubmitError(`Could not save: ${error}`);
+      setSubmitError(`${t('listEquipment.couldNotSave')}${error}`);
     } else {
       navigate("/discover");
     }
@@ -85,15 +87,15 @@ export function ListEquipmentPage() {
     <div className="min-h-screen pt-16 bg-background">
       <div className="max-w-4xl mx-auto px-4 py-12">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-4">List Your Equipment</h1>
-          <p className="text-lg text-muted-foreground">Share your machinery with farmers in your community</p>
+          <h1 className="text-4xl font-bold text-foreground mb-4">{t('listEquipment.title')}</h1>
+          <p className="text-lg text-muted-foreground">{t('listEquipment.subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Equipment Photos */}
           <div className="bg-card rounded-2xl p-6">
-            <h2 className="text-xl font-semibold mb-4">Equipment Photos</h2>
-            <p className="text-sm text-muted-foreground mb-4">Upload clear photos of your equipment from different angles</p>
+            <h2 className="text-xl font-semibold mb-4">{t('listEquipment.photosTitle')}</h2>
+            <p className="text-sm text-muted-foreground mb-4">{t('listEquipment.photosDesc')}</p>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
               {imagePreviews.map((image, index) => (
@@ -111,7 +113,7 @@ export function ListEquipmentPage() {
               
               <label className="aspect-square border-2 border-dashed border-border rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors">
                 <Upload className="w-8 h-8 text-muted-foreground mb-2" />
-                <span className="text-sm text-muted-foreground">Upload</span>
+                <span className="text-sm text-muted-foreground">{t('listEquipment.upload')}</span>
                 <input
                   type="file"
                   multiple
@@ -127,21 +129,21 @@ export function ListEquipmentPage() {
           <div className="bg-card rounded-2xl p-6 space-y-6 border-2 border-primary/20 bg-primary/5">
             <h2 className="text-xl font-semibold flex items-center gap-2">
               <Store className="w-6 h-6 text-primary" />
-              Target CHC Hub
+              {t('listEquipment.targetChcTitle')}
             </h2>
-            <p className="text-sm text-muted-foreground">Select the CHC center where you will deposit this equipment for rental</p>
+            <p className="text-sm text-muted-foreground">{t('listEquipment.targetChcDesc')}</p>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Select CHC Center *</label>
+              <label className="block text-sm font-medium mb-2">{t('listEquipment.selectChcLabel')}</label>
               <select
                 required
                 value={formData.chc}
                 onChange={(e) => setFormData({ ...formData, chc: e.target.value })}
                 className="w-full px-4 py-3 bg-input-background rounded-xl border border-primary/30 focus:ring-2 focus:ring-primary outline-none"
               >
-                <option value="">Select a center</option>
+                <option value="">{t('listEquipment.selectCenterOpt')}</option>
                 {CHC_CENTERS.map(chc => (
-                  <option key={chc.id} value={chc.id}>CHC – {chc.name}</option>
+                  <option key={chc.id} value={chc.id}>{t('chccenters.cardPrefix')}{chc.name}</option>
                 ))}
               </select>
             </div>
@@ -149,14 +151,14 @@ export function ListEquipmentPage() {
 
           {/* Equipment Details */}
           <div className="bg-card rounded-2xl p-6 space-y-6">
-            <h2 className="text-xl font-semibold">Equipment Details</h2>
+            <h2 className="text-xl font-semibold">{t('listEquipment.equipmentDetailsTitle')}</h2>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Equipment Name *</label>
+              <label className="block text-sm font-medium mb-2">{t('listEquipment.equipNameLabel')}</label>
               <input
                 type="text"
                 required
-                placeholder="e.g., Mahindra 475 DI Tractor"
+                placeholder={t('listEquipment.equipNamePlace')}
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="w-full px-4 py-3 bg-input-background rounded-xl border-0 focus:ring-2 focus:ring-primary outline-none"
@@ -164,31 +166,31 @@ export function ListEquipmentPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Machine Type *</label>
+              <label className="block text-sm font-medium mb-2">{t('listEquipment.machineTypeLabel')}</label>
               <select
                 required
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                 className="w-full px-4 py-3 bg-input-background rounded-xl border-0 focus:ring-2 focus:ring-primary outline-none"
               >
-                <option value="">Select type</option>
-                <option value="tractor">Tractor</option>
-                <option value="harvester">Harvester</option>
-                <option value="irrigation">Irrigation System</option>
-                <option value="seeder">Seeder</option>
-                <option value="transport">Transport Equipment</option>
-                <option value="other">Other</option>
+                <option value="">{t('listEquipment.selectTypeOpt')}</option>
+                <option value="tractor">{t('listEquipment.types.tractor')}</option>
+                <option value="harvester">{t('listEquipment.types.harvester')}</option>
+                <option value="irrigation">{t('listEquipment.types.irrigation')}</option>
+                <option value="seeder">{t('listEquipment.types.seeder')}</option>
+                <option value="transport">{t('listEquipment.types.transport')}</option>
+                <option value="other">{t('listEquipment.types.other')}</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Your Location *</label>
+              <label className="block text-sm font-medium mb-2">{t('listEquipment.locationLabel')}</label>
               <div className="relative">
                 <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
                   type="text"
                   required
-                  placeholder="Village, District, State"
+                  placeholder={t('listEquipment.locationPlace')}
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                   className="w-full pl-12 pr-4 py-3 bg-input-background rounded-xl border-0 focus:ring-2 focus:ring-primary outline-none"
@@ -197,7 +199,7 @@ export function ListEquipmentPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Price per Hour *</label>
+              <label className="block text-sm font-medium mb-2">{t('listEquipment.priceLabel')}</label>
               <div className="relative">
                 <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
@@ -212,10 +214,10 @@ export function ListEquipmentPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Description</label>
+              <label className="block text-sm font-medium mb-2">{t('listEquipment.descLabel')}</label>
               <textarea
                 rows={4}
-                placeholder="Describe your equipment, its condition, and any special features..."
+                placeholder={t('listEquipment.descPlace')}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="w-full px-4 py-3 bg-input-background rounded-xl border-0 focus:ring-2 focus:ring-primary outline-none resize-none"
@@ -231,11 +233,11 @@ export function ListEquipmentPage() {
               className="flex-1 bg-primary text-primary-foreground py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isSubmitting ? (
-                <>Listing Equipment...</>
+                <>{t('listEquipment.listingBtn')}</>
               ) : (
                 <>
                   <CheckCircle2 className="w-5 h-5" />
-                  List Equipment
+                  {t('listEquipment.listEquipBtn')}
                 </>
               )}
             </button>
@@ -244,7 +246,7 @@ export function ListEquipmentPage() {
               onClick={() => navigate(-1)}
               className="px-8 py-4 bg-muted text-foreground rounded-xl font-semibold hover:bg-muted/80 transition-colors"
             >
-              Cancel
+              {t('listEquipment.cancelBtn')}
             </button>
           </div>
         </form>
