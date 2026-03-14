@@ -43,11 +43,11 @@ export function LandingPage() {
 
   useEffect(() => {
     const selectedCHC = getSelectedCHC();
-    if (selectedCHC) {
-      setFeaturedListings(getAllEquipment(selectedCHC.id).slice(0, 3));
-    } else {
-      setFeaturedListings(getAllEquipment().slice(0, 3));
+    async function load() {
+      const all = await getAllEquipment(selectedCHC?.id);
+      setFeaturedListings(all.slice(0, 3));
     }
+    load();
   }, []);
 
   return (

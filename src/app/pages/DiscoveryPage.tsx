@@ -13,7 +13,7 @@ export function DiscoveryPage() {
   const [selectedEquipment, setSelectedEquipment] = useState<number | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<string>("");
   const [equipmentList, setEquipmentList] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Update searchQuery if URL changes
   useEffect(() => {
@@ -24,14 +24,16 @@ export function DiscoveryPage() {
   }, [searchParams]);
 
   useEffect(() => {
-    // Get user's selected CHC from auth utilities
     const selectedCHC = getSelectedCHC();
-    if (selectedCHC) {
-      setSelectedLocation(selectedCHC.name);
-      setEquipmentList(getAllEquipment(selectedCHC.id));
-    } else {
-      setEquipmentList(getAllEquipment());
+    if (selectedCHC) setSelectedLocation(selectedCHC.name);
+
+    async function loadEquipment() {
+      setIsLoading(true);
+      const data = await getAllEquipment(selectedCHC?.id);
+      setEquipmentList(data);
+      setIsLoading(false);
     }
+    loadEquipment();
   }, []);
 
   const handleChangeLocation = () => {

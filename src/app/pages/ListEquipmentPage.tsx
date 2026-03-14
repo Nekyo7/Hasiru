@@ -13,6 +13,7 @@ export function ListEquipmentPage() {
   const ownerEmail: string = user?.email || "";
   const [images, setImages] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     type: "",
@@ -34,12 +35,13 @@ export function ListEquipmentPage() {
     setImages(images.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
     setIsSubmitting(true);
+    setSubmitError(null);
     
-    // Save to local storage
-    saveUserEquipment({
+    const { error } = await saveUserEquipment({
       name: formData.name,
       image: images[0] || "https://images.unsplash.com/photo-1592982537447-7440770cbdi?fit=crop&q=80&w=800",
       category: formData.type.charAt(0).toUpperCase() + formData.type.slice(1),
@@ -50,12 +52,14 @@ export function ListEquipmentPage() {
       chc_id: parseInt(formData.chc),
       ownerName,
       ownerEmail,
-    });
+    }, user.id);
 
-    setTimeout(() => {
-      setIsSubmitting(false);
+    setIsSubmitting(false);
+    if (error) {
+      setSubmitError(`Could not save: ${error}`);
+    } else {
       navigate("/discover");
-    }, 1000);
+    }
   };
 
   return (

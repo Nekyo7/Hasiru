@@ -23,11 +23,15 @@ export function EquipmentDetailPage() {
 
   useEffect(() => {
     if (!id) return;
-    const found = getAllEquipment().find(e => e.id === parseInt(id));
-    if (found) setEquipment(found);
+    async function load() {
+      const all = await getAllEquipment();
+      const found = all.find(e => e.id === parseInt(id!));
+      if (found) setEquipment(found);
+    }
+    load();
   }, [id]);
 
-  const handleRequestBooking = () => {
+  const handleRequestBooking = async () => {
     if (!isAuthenticated) {
       navigate("/login");
       return;
@@ -40,7 +44,7 @@ export function EquipmentDetailPage() {
     const priceNum = parseInt(equipment.price.replace(/[^\d]/g, "")) || 0;
     const total = `₹${priceNum * hours}`;
 
-    saveRentalRequest({
+    const { error } = await saveRentalRequest({
       equipmentId: equipment.id,
       equipmentName: equipment.name,
       equipmentImage: equipment.image,
@@ -51,12 +55,10 @@ export function EquipmentDetailPage() {
       date: selectedDate,
       hours,
       totalPrice: total,
-    });
+    }, user.id);
 
-    setTimeout(() => {
-      setIsRequesting(false);
-      setRequestSent(true);
-    }, 1200);
+    setIsRequesting(false);
+    if (!error) setRequestSent(true);
   };
 
   if (isLoading) {

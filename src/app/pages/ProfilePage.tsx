@@ -36,9 +36,17 @@ export function ProfilePage() {
 
   useEffect(() => {
     if (!userEmail) return;
-    setMyEquipment(getEquipmentByOwner(userEmail));
-    setSentRequests(getRequestsByRequester(userEmail));
-    setReceivedRequests(getRequestsForOwner(userEmail));
+    async function load() {
+      const [equip, sent, received] = await Promise.all([
+        getEquipmentByOwner(userEmail),
+        getRequestsByRequester(userEmail),
+        getRequestsForOwner(userEmail),
+      ]);
+      setMyEquipment(equip);
+      setSentRequests(sent);
+      setReceivedRequests(received);
+    }
+    load();
     const chc = getSelectedCHC();
     if (chc) setSelectedCHC(chc.name);
   }, [userEmail]);
