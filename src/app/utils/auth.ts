@@ -31,7 +31,7 @@ export const CHC_CENTERS: CHCCenter[] = [
     map_link: "https://maps.app.goo.gl/z9tUBEy8GwkWbifZ9",
     distance: "8 km away",
     phone: "080-23330154",
-    image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef"
+    image: "/images/uddurkaval_ch_centre.png"
   },
   {
     id: 16,
@@ -40,7 +40,7 @@ export const CHC_CENTERS: CHCCenter[] = [
     map_link: "https://www.google.com/maps/search/Primary+Health+Cent",
     distance: "12 km away",
     phone: "080-23330155",
-    image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef"
+    image: "/images/dodballapura_ch_centre.jpg"
   },
   {
     id: 20,
@@ -49,7 +49,7 @@ export const CHC_CENTERS: CHCCenter[] = [
     map_link: "https://share.google/6z8m6XfwmRBCPcAue",
     distance: "Local",
     phone: "Contact Local Authority",
-    image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef"
+    image: "/images/dalasanuru_ch_centre.png"
   }
 ];
 
