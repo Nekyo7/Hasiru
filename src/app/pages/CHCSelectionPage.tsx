@@ -3,9 +3,11 @@ import { useNavigate } from "react-router";
 import { MapPin, Users, Phone, Clock, ArrowRight, CheckCircle, Search, Loader2, ExternalLink } from "lucide-react";
 import { selectCHC, CHC_CENTERS } from "../utils/auth";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export function CHCSelectionPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [centers] = useState<any[]>(CHC_CENTERS);
@@ -54,9 +56,9 @@ export function CHCSelectionPage() {
       <div className="max-w-7xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Select Your CHC Center</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-2">{t('chcselection.title')}</h1>
           <p className="text-muted-foreground mb-6">
-            Find and select the CHC center near you to browse available equipment
+            {t('chcselection.subtitle')}
           </p>
           
           {/* Search Bar */}
@@ -64,7 +66,7 @@ export function CHCSelectionPage() {
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search by center name, location, or phone number..."
+              placeholder={t('chcselection.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-12 pr-4 py-3 bg-card border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -131,13 +133,13 @@ export function CHCSelectionPage() {
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <MapPin className="w-12 h-12 text-muted-foreground/30 mb-3" />
                 <p className="text-muted-foreground">
-                  No CHC centers found matching "{searchQuery}"
+                  {t('chcselection.noResults')} "{searchQuery}"
                 </p>
                 <button
                   onClick={() => setSearchQuery("")}
                   className="text-primary hover:underline text-sm mt-2"
                 >
-                  Clear search
+                  {t('chcselection.clearSearch')}
                 </button>
               </div>
             )}
@@ -148,14 +150,14 @@ export function CHCSelectionPage() {
             {selectedCenter ? (
               <div className="sticky top-24 bg-card rounded-2xl p-6 shadow-sm border border-border space-y-6">
                 <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Selected Center</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">{t('chcselection.detailTitle')}</p>
                   <h2 className="text-2xl font-bold text-foreground">{selectedCenter.name}</h2>
                 </div>
 
                 <div className="flex items-start gap-3">
                   <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-xs text-muted-foreground uppercase">Location</p>
+                    <p className="text-xs text-muted-foreground uppercase">{t('chccenters.location')}</p>
                     <p className="font-semibold text-foreground text-sm">{selectedCenter.address}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs text-muted-foreground">{selectedCenter.distance}</span>
@@ -167,7 +169,7 @@ export function CHCSelectionPage() {
                           className="text-xs text-primary hover:underline flex items-center gap-1"
                         >
                           <ExternalLink className="w-3 h-3" />
-                          View on Map
+                          {t('chccenters.viewMap')}
                         </a>
                       )}
                     </div>
@@ -177,7 +179,7 @@ export function CHCSelectionPage() {
                 <div className="flex items-start gap-3">
                   <Phone className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-xs text-muted-foreground uppercase">Contact</p>
+                    <p className="text-xs text-muted-foreground uppercase">{t('chccenters.contact')}</p>
                     <p className="font-semibold text-foreground">{selectedCenter.phone}</p>
                   </div>
                 </div>
@@ -185,7 +187,7 @@ export function CHCSelectionPage() {
                 <div className="flex items-start gap-3">
                   <Clock className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-xs text-muted-foreground uppercase">Hours</p>
+                    <p className="text-xs text-muted-foreground uppercase">{t('chcselection.hours')}</p>
                     <p className="font-semibold text-foreground">{selectedCenter.operating_hours || '6:00 AM - 6:00 PM'}</p>
                   </div>
                 </div>
@@ -194,19 +196,19 @@ export function CHCSelectionPage() {
                   onClick={handleConfirmSelection}
                   className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
                 >
-                  <span>Confirm Selection</span>
+                  <span>{t('chcselection.confirm')}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
 
                 <p className="text-xs text-muted-foreground text-center">
-                  You can change your CHC center anytime in your profile settings.
+                  {t('chcselection.detailFooter')}
                 </p>
               </div>
             ) : (
               <div className="sticky top-24 bg-card rounded-2xl p-6 shadow-sm border border-dashed border-border flex flex-col items-center justify-center min-h-64">
                 <MapPin className="w-12 h-12 text-muted-foreground/30 mb-3" />
                 <p className="text-center text-muted-foreground text-sm">
-                  Select a CHC center from the list to view details
+                  {t('chcselection.noSelection')}
                 </p>
               </div>
             )}

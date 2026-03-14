@@ -54,7 +54,10 @@ const equipmentLocations = [
   }
 ];
 
+import { useLanguage } from "../contexts/LanguageContext";
+
 export function MapViewPage() {
+  const { t } = useLanguage();
   const [selectedEquipment, setSelectedEquipment] = useState<number | null>(null);
 
   const selected = equipmentLocations.find(e => e.id === selectedEquipment);
@@ -76,11 +79,11 @@ export function MapViewPage() {
         <div className="absolute top-6 left-6 right-6 bg-card rounded-2xl p-4 shadow-lg z-10">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold">Equipment Near You</h1>
-              <p className="text-sm text-muted-foreground">Click on tractor icons to view details</p>
+              <h1 className="text-2xl font-bold">{t('map.equipmentNearYou')}</h1>
+              <p className="text-sm text-muted-foreground">{t('map.clickToView')}</p>
             </div>
             <div className="bg-primary/10 text-primary px-4 py-2 rounded-lg">
-              <span className="font-semibold">{equipmentLocations.length} available</span>
+              <span className="font-semibold">{equipmentLocations.length} {t('map.available')}</span>
             </div>
           </div>
         </div>
@@ -140,7 +143,7 @@ export function MapViewPage() {
                 <h3 className="text-2xl font-bold mb-3">{selected.name}</h3>
                 <div className="flex items-center gap-2 text-muted-foreground mb-4">
                   <MapPin className="w-4 h-4" />
-                  <span>{selected.distance} away</span>
+                  <span>{selected.distance} {t('map.away')}</span>
                 </div>
                 <div className="flex items-center justify-between mb-6">
                   <div>
@@ -151,7 +154,7 @@ export function MapViewPage() {
                     to={`/equipment/${selected.id}`}
                     className="bg-primary text-primary-foreground px-6 py-3 rounded-xl hover:opacity-90 transition-opacity font-semibold"
                   >
-                    View Details
+                    {t('map.viewDetails')}
                   </Link>
                 </div>
               </div>
@@ -163,20 +166,20 @@ export function MapViewPage() {
         <div className="absolute bottom-6 right-6 bg-card rounded-xl p-4 shadow-lg z-10">
           <h3 className="font-semibold mb-3 flex items-center gap-2">
             <MapPin className="w-4 h-4" />
-            Legend
+            {t('map.legend')}
           </h3>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <div className="bg-primary rounded-full p-2">
                 <Tractor className="w-3 h-3 text-primary-foreground" />
               </div>
-              <span className="text-sm text-muted-foreground">Available equipment</span>
+              <span className="text-sm text-muted-foreground">{t('map.availableEquipment')}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="bg-primary/20 rounded-full p-2">
                 <Tractor className="w-3 h-3 text-primary" />
               </div>
-              <span className="text-sm text-muted-foreground">Selected</span>
+              <span className="text-sm text-muted-foreground">{t('map.selected')}</span>
             </div>
           </div>
         </div>

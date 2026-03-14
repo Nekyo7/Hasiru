@@ -2,9 +2,11 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router";
 import { Mail, Phone, ArrowRight } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     email: "",
     phone: "",
@@ -56,11 +58,10 @@ export function LoginPage() {
   return (
     <div className="min-h-screen pt-16 bg-background flex flex-col items-center justify-center">
       <div className="w-full max-w-md mx-auto px-4 py-12">
-        {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Welcome back!</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-2">{t('auth.welcomeBack')}</h1>
           <p className="text-muted-foreground">
-            Sign in to access affordable agricultural equipment rentals
+            {t('auth.loginSubtitle')}
           </p>
         </div>
 
@@ -70,13 +71,13 @@ export function LoginPage() {
             {/* Email Field */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Email Address
+                {t('auth.emailAddress')}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
                   type="email"
-                  placeholder="your.email@example.com"
+                  placeholder={t('auth.emailPlaceholder')}
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full pl-10 pr-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -88,13 +89,13 @@ export function LoginPage() {
             {/* Phone Field */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Phone Number <span className="text-muted-foreground text-xs">(Password)</span>
+                {t('auth.phoneNumber')} <span className="text-muted-foreground text-xs">{t('auth.passwordNote')}</span>
               </label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
                   type="password"
-                  placeholder="9876543210"
+                  placeholder={t('auth.phonePlaceholder')}
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   className="w-full pl-10 pr-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -115,35 +116,35 @@ export function LoginPage() {
               disabled={isLoading}
               className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
             >
-              <span>{isLoading ? "Signing in..." : "Log In"}</span>
+              <span>{isLoading ? t('auth.signingIn') : t('auth.logIn')}</span>
               {!isLoading && <ArrowRight className="w-4 h-4" />}
             </button>
           </form>
 
           {/* Info Text */}
           <div className="mt-6 text-center text-sm text-muted-foreground">
-            Don't have an account?{" "}
+            {t('auth.noAccount')}{" "}
             <Link to="/signup" className="text-primary hover:underline font-medium">
-              Sign up
+              {t('auth.signUp')}
             </Link>
           </div>
         </div>
 
         {/* Benefits Section */}
         <div className="mt-8 space-y-3">
-          <h3 className="text-sm font-semibold text-foreground">Why join Hasiru?</h3>
+          <h3 className="text-sm font-semibold text-foreground">{t('auth.whyJoin')}</h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li className="flex items-start gap-2">
               <span className="text-primary font-bold">✓</span>
-              <span>Access to 400+ equipment across CHC centers</span>
+              <span>{t('auth.benefit1')}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary font-bold">✓</span>
-              <span>Affordable hourly and daily rental rates</span>
+              <span>{t('auth.benefit2')}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary font-bold">✓</span>
-              <span>Quick booking and on-time delivery</span>
+              <span>{t('auth.benefit3')}</span>
             </li>
           </ul>
         </div>

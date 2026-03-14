@@ -3,9 +3,11 @@ import { useNavigate } from "react-router";
 import { MapPin, Users, Clock, Phone, ArrowRight, Loader2, ExternalLink } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { CHC_CENTERS } from "../utils/auth";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export function CHCCentersPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [centers] = useState<any[]>(CHC_CENTERS);
   const [isLoading] = useState(false);
 
@@ -31,9 +33,9 @@ export function CHCCentersPage() {
       <div className="max-w-7xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-3">CHC Centers</h1>
+          <h1 className="text-4xl font-bold text-foreground mb-3">{t('chccenters.title')}</h1>
           <p className="text-lg text-muted-foreground">
-            Select your nearest Custom Hiring Center in Bengaluru Rural area
+            {t('chccenters.subtitle')}
           </p>
         </div>
 
@@ -59,14 +61,14 @@ export function CHCCentersPage() {
                   {/* Info */}
                   <div className="mb-4">
                     <h2 className="text-2xl font-bold text-foreground mb-4">
-                      CHC – {center.name}
+                      {t('chccenters.cardPrefix')}{center.name}
                     </h2>
                     
                     <div className="space-y-3 text-sm">
                       <div className="flex items-start gap-3">
                         <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div className="flex-1">
-                          <p className="text-muted-foreground">Location</p>
+                          <p className="text-muted-foreground">{t('chccenters.location')}</p>
                           <p className="font-semibold text-foreground">{center.address}</p>
                           <div className="flex items-center gap-2 mt-1">
                             <span className="text-xs text-muted-foreground">{center.distance}</span>
@@ -78,7 +80,7 @@ export function CHCCentersPage() {
                                 className="text-xs text-primary hover:underline flex items-center gap-1"
                               >
                                 <ExternalLink className="w-3 h-3" />
-                                View on Map
+                                {t('chccenters.viewMap')}
                               </a>
                             )}
                           </div>
@@ -88,7 +90,7 @@ export function CHCCentersPage() {
                       <div className="flex items-start gap-3">
                         <Phone className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="text-muted-foreground">Contact</p>
+                          <p className="text-muted-foreground">{t('chccenters.contact')}</p>
                           <p className="font-semibold text-foreground">{center.phone}</p>
                         </div>
                       </div>
@@ -96,7 +98,7 @@ export function CHCCentersPage() {
                       <div className="flex items-start gap-3">
                         <Clock className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="text-muted-foreground">Operating Hours</p>
+                          <p className="text-muted-foreground">{t('chccenters.operatingHours')}</p>
                           <p className="font-semibold text-foreground">{center.operating_hours || '6:00 AM - 6:00 PM'}</p>
                         </div>
                       </div>
@@ -108,7 +110,7 @@ export function CHCCentersPage() {
                     onClick={() => handleSelectCHC(center.name)}
                     className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 group/btn"
                   >
-                    <span>Select This Center</span>
+                    <span>{t('chccenters.selectCenter')}</span>
                     <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                   </button>
                 </div>
@@ -119,22 +121,22 @@ export function CHCCentersPage() {
 
         {/* Info Section */}
         <div className="mt-16 bg-primary/5 rounded-2xl p-8 border border-primary/10">
-          <h3 className="text-2xl font-semibold text-foreground mb-4">About Our CHCs</h3>
+          <h3 className="text-2xl font-semibold text-foreground mb-4">{t('chccenters.aboutTitle')}</h3>
           <p className="text-muted-foreground mb-4">
-            Custom Hiring Centers (CHCs) are government-supported facilities where farmers can rent agricultural equipment instead of purchasing them. This reduces costs and makes modern farming technology accessible to all farmers.
+            {t('chccenters.aboutDesc')}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
             <div>
-              <h4 className="font-semibold text-foreground mb-2">Wide Equipment Range</h4>
-              <p className="text-sm text-muted-foreground">Tractors, harvesters, seeders, irrigation systems, and more</p>
+              <h4 className="font-semibold text-foreground mb-2">{t('chccenters.rangeTitle')}</h4>
+              <p className="text-sm text-muted-foreground">{t('chccenters.rangeDesc')}</p>
             </div>
             <div>
-              <h4 className="font-semibold text-foreground mb-2">Affordable Rates</h4>
-              <p className="text-sm text-muted-foreground">Hourly rental pricing designed for farming operations</p>
+              <h4 className="font-semibold text-foreground mb-2">{t('chccenters.ratesTitle')}</h4>
+              <p className="text-sm text-muted-foreground">{t('chccenters.ratesDesc')}</p>
             </div>
             <div>
-              <h4 className="font-semibold text-foreground mb-2">Quality Support</h4>
-              <p className="text-sm text-muted-foreground">Professional maintenance and customer service</p>
+              <h4 className="font-semibold text-foreground mb-2">{t('chccenters.supportTitle')}</h4>
+              <p className="text-sm text-muted-foreground">{t('chccenters.supportDesc')}</p>
             </div>
           </div>
         </div>

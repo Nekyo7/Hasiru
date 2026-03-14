@@ -4,9 +4,11 @@ import { MapPin, Filter, Search, Tractor, ArrowLeft, Loader2, ArrowRight } from 
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { getSelectedCHC } from "../utils/auth";
 import { getAllEquipment } from "../utils/equipmentData";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export function DiscoveryPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [searchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
   const [searchQuery, setSearchQuery] = useState(initialQuery);
@@ -62,8 +64,8 @@ export function DiscoveryPage() {
               <div className="flex items-center gap-3">
                 <MapPin className="w-5 h-5 text-primary" />
                 <div>
-                  <p className="text-sm text-muted-foreground">Selected CHC</p>
-                  <p className="text-lg font-semibold text-foreground">CHC Center – {selectedLocation}</p>
+                  <p className="text-sm text-muted-foreground">{t('discovery.selectedChc')}</p>
+                  <p className="text-lg font-semibold text-foreground">{t('discovery.chcCenter')}{selectedLocation}</p>
                 </div>
               </div>
               <button
@@ -71,7 +73,7 @@ export function DiscoveryPage() {
                 className="flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors text-primary font-medium text-sm"
               >
                 <ArrowLeft className="w-4 h-4" />
-                Change Center
+                {t('discovery.changeCenter')}
               </button>
             </div>
           </div>
@@ -86,7 +88,7 @@ export function DiscoveryPage() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <input
                 type="text"
-                placeholder="Search for tractors, harvesters, equipment..."
+                placeholder={t('discovery.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 bg-input-background rounded-xl border-0 focus:ring-2 focus:ring-primary outline-none"
@@ -94,7 +96,7 @@ export function DiscoveryPage() {
             </div>
             <button className="flex items-center gap-2 px-4 py-3 bg-input-background rounded-xl hover:bg-muted transition-colors">
               <Filter className="w-5 h-5" />
-              <span className="hidden sm:inline">Filters</span>
+              <span className="hidden sm:inline">{t('discovery.filters')}</span>
             </button>
           </div>
         </div>
@@ -104,7 +106,7 @@ export function DiscoveryPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredEquipment.length === 0 ? (
             <div className="col-span-1 md:col-span-2 lg:col-span-3 text-center py-12 text-muted-foreground">
-              No equipment available at the moment.
+              {t('discovery.noEquipment')}
             </div>
           ) : (
             filteredEquipment.map((equipment) => (
@@ -121,7 +123,7 @@ export function DiscoveryPage() {
                   />
                   {equipment.available && (
                     <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">
-                      Available
+                      {t('discovery.available')}
                     </div>
                   )}
                 </div>
@@ -136,10 +138,10 @@ export function DiscoveryPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-2xl font-bold text-foreground">{equipment.price}</span>
-                      <span className="text-muted-foreground">/hour</span>
+                      <span className="text-muted-foreground">{t('discovery.perHour')}</span>
                     </div>
                     <span className="text-primary font-medium hover:underline flex items-center gap-1">
-                      View details <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      {t('discovery.viewDetails')} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </span>
                   </div>
                 </div>
