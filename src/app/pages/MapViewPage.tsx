@@ -3,7 +3,7 @@ import { Tractor, MapPin, X } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { Link } from "react-router";
 
-const equipmentLocations = [
+const getEquipmentLocations = (t: any) => [
   {
     id: 1,
     name: "Mahindra 475 DI",
@@ -22,7 +22,7 @@ const equipmentLocations = [
   },
   {
     id: 3,
-    name: "Combine Harvester",
+    name: t('dashboard.types.harvester'),
     price: "₹2,500/hr",
     distance: "8 km",
     image: "https://images.unsplash.com/photo-1655818805647-585cb9c9b02a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYXJtJTIwbWFjaGluZXJ5JTIwZXF1aXBtZW50fGVufDF8fHx8MTc3MzMwODE0Nnww&ixlib=rb-4.1.0&q=80&w=1080",
@@ -30,7 +30,7 @@ const equipmentLocations = [
   },
   {
     id: 4,
-    name: "Irrigation Pump",
+    name: t('dashboard.types.irrigation'),
     price: "₹350/hr",
     distance: "6.5 km",
     image: "https://images.unsplash.com/photo-1598370025936-0856434d26e7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpcnJpZ2F0aW9uJTIwc3lzdGVtJTIwZmFybXxlbnwxfHx8fDE3NzMzODkwNDV8MA&ixlib=rb-4.1.0&q=80&w=1080",
@@ -38,7 +38,7 @@ const equipmentLocations = [
   },
   {
     id: 5,
-    name: "Seed Drill",
+    name: t('dashboard.types.seeder'),
     price: "₹450/hr",
     distance: "4.8 km",
     image: "https://images.unsplash.com/photo-1764277434161-23d72931335f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzZWVkaW5nJTIwZXF1aXBtZW50JTIwYWdyaWN1bHR1cmV8ZW58MXx8fHwxNzczMzg5MzM5fDA&ixlib=rb-4.1.0&q=80&w=1080",
@@ -46,7 +46,7 @@ const equipmentLocations = [
   },
   {
     id: 6,
-    name: "Transport Truck",
+    name: t('dashboard.types.transport'),
     price: "₹800/hr",
     distance: "10 km",
     image: "https://images.unsplash.com/photo-1760765622766-0338e7c65d4d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYXJtJTIwdHJhbnNwb3J0JTIwdHJ1Y2t8ZW58MXx8fHwxNzczMzg5MzQwfDA&ixlib=rb-4.1.0&q=80&w=1080",
@@ -60,6 +60,7 @@ export function MapViewPage() {
   const { t } = useLanguage();
   const [selectedEquipment, setSelectedEquipment] = useState<number | null>(null);
 
+  const equipmentLocations = getEquipmentLocations(t);
   const selected = equipmentLocations.find(e => e.id === selectedEquipment);
 
   return (

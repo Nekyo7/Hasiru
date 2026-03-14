@@ -30,7 +30,7 @@ export function EquipmentDetailPage() {
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   const userMeta = user?.user_metadata || {};
-  const userName: string = userMeta.name || userMeta.full_name || user?.email?.split("@")[0] || "Farmer";
+  const userName: string = userMeta.name || userMeta.full_name || user?.email?.split("@")[0] || t('equipmentDetail.farmer');
   const userPhone: string = userMeta.phone || "";
 
   useEffect(() => {
@@ -110,7 +110,7 @@ export function EquipmentDetailPage() {
         setRequestSent(true);
       }
     } catch (err: any) {
-      setSubmitError(err.message || "An unexpected error occurred. Please try again.");
+      setSubmitError(err.message || t('equipmentDetail.unexpectedError'));
     } finally {
       setIsRequesting(false);
     }
@@ -143,14 +143,14 @@ export function EquipmentDetailPage() {
       "https://images.unsplash.com/photo-1758636528604-a8b3d3824157?fit=crop&w=1080&q=80",
       "https://images.unsplash.com/photo-1685335686020-e0b487f7f426?fit=crop&w=1080&q=80"
     ],
-    description: `Well-maintained ${equipment.name}, perfect for plowing, tilling, and general farm work. Regularly serviced and in excellent working condition. Comes with standard attachments.`,
+    description: t('equipmentDetail.equipDescTemplate').replace('{name}', equipment.name),
     specifications: {
       [t('equipmentDetail.enginePower')]: "42 HP",
-      [t('equipmentDetail.fuelType')]: "Diesel",
+      [t('equipmentDetail.fuelType')]: t('equipmentDetail.diesel'),
       [t('equipmentDetail.year')]: "2021",
-      [t('equipmentDetail.condition')]: "Excellent",
-      [t('equipmentDetail.hoursUsed')]: "850 hours",
-      [t('equipmentDetail.transmission')]: "8 Forward + 2 Reverse"
+      [t('equipmentDetail.condition')]: t('equipmentDetail.excellent'),
+      [t('equipmentDetail.hoursUsed')]: `850 ${t('equipmentDetail.hours')}`,
+      [t('equipmentDetail.transmission')]: `8 ${t('equipmentDetail.forward')} + 2 ${t('equipmentDetail.reverse')}`
     },
   };
 
@@ -239,7 +239,7 @@ export function EquipmentDetailPage() {
                     </a>
                   ) : (
                     <div className="mt-2 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-md border border-amber-100 inline-block">
-                      Contact info available after booking
+                      {t('equipmentDetail.contactAfterBooking')}
                     </div>
                   )}
                 </div>
@@ -310,13 +310,13 @@ export function EquipmentDetailPage() {
                       className="mt-1 h-5 w-5 rounded border-primary/30 text-primary focus:ring-primary cursor-pointer accent-primary"
                     />
                     <label htmlFor="terms" className="text-sm font-medium text-foreground leading-snug cursor-pointer select-none">
-                      {t('equipmentDetail.agreeTo')} <button onClick={() => setShowTermsModal(true)} type="button" className="text-primary font-bold hover:underline underline-offset-4 decoration-2">{t('equipmentDetail.termsAndConditions')}</button> {t('equipmentDetail.rentingEquipment')}.
+                      {t('equipmentDetail.readAndAgree')} <button onClick={() => setShowTermsModal(true)} type="button" className="text-primary font-bold hover:underline underline-offset-4 decoration-2">{t('equipmentDetail.termsAndConditions')}</button> {t('equipmentDetail.rentingEquipment')}.
                     </label>
                   </div>
                   {!acceptedTerms && (
                     <div className="flex items-center gap-1.5 mt-2.5">
                       <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                      <p className="text-[10px] text-amber-700 uppercase tracking-wider font-extrabold">Requirement: Accept terms to book</p>
+                      <p className="text-[10px] text-amber-700 uppercase tracking-wider font-extrabold">{t('equipmentDetail.requirementAccept')}</p>
                     </div>
                   )}
                 </div>
@@ -487,24 +487,24 @@ export function EquipmentDetailPage() {
                 <Shield className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h3 className="text-xl font-bold">Rental Terms & Conditions</h3>
-                <p className="text-sm text-muted-foreground">Please read before booking</p>
+                <h3 className="text-xl font-bold">{t('equipmentDetail.terms.title')}</h3>
+                <p className="text-sm text-muted-foreground">{t('equipmentDetail.terms.subtitle')}</p>
               </div>
             </div>
             
             <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2 text-sm text-muted-foreground leading-relaxed custom-scrollbar">
               <div className="space-y-4">
-                <p>1. <strong>General:</strong> By requesting to rent equipment through the Smart CHC Network platform, the user agrees to follow all rules and conditions set by the Custom Hiring Center (CHC) and the platform.</p>
-                <p>2. <strong>User Information:</strong> The user must provide correct details including name, phone number, email, and address. Providing false information may lead to cancellation of the request.</p>
-                <p>3. <strong>Availability of Equipment:</strong> All equipment is subject to availability at the selected CHC. Submitting a request does not guarantee confirmation until the CHC approves the booking.</p>
-                <p>4. <strong>Rental Duration:</strong> The user must return the equipment within the approved rental time. Late return may result in extra charges decided by the CHC.</p>
-                <p>5. <strong>Usage Responsibility:</strong> The user must use the equipment only for agricultural purposes. Any damage caused due to misuse will be the responsibility of the user.</p>
-                <p>6. <strong>Damage and Loss:</strong> If equipment is damaged, lost, or returned in poor condition, the user may be required to pay repair or replacement cost as decided by the CHC operator.</p>
-                <p>7. <strong>Payment:</strong> Rental charges will be decided based on machine type, duration, and CHC rules. Payment may be collected at the CHC or during delivery.</p>
-                <p>8. <strong>Cancellation:</strong> The CHC has the right to cancel or reschedule the booking if equipment is not available or due to operational reasons.</p>
-                <p>9. <strong>Contact with CHC:</strong> The user may contact the selected CHC for help, schedule changes, or support.</p>
-                <p>10. <strong>Platform Role:</strong> Smart CHC Network is a digital platform that connects users with Custom Hiring Centers. The platform is not responsible for physical damage, delays, or disputes between user and CHC.</p>
-                <p>11. <strong>Acceptance:</strong> By clicking "Agree and Request", the user confirms that they have read and accepted all terms and conditions.</p>
+                <p>{t('equipmentDetail.terms.p1')}</p>
+                <p>{t('equipmentDetail.terms.p2')}</p>
+                <p>{t('equipmentDetail.terms.p3')}</p>
+                <p>{t('equipmentDetail.terms.p4')}</p>
+                <p>{t('equipmentDetail.terms.p5')}</p>
+                <p>{t('equipmentDetail.terms.p6')}</p>
+                <p>{t('equipmentDetail.terms.p7')}</p>
+                <p>{t('equipmentDetail.terms.p8')}</p>
+                <p>{t('equipmentDetail.terms.p9')}</p>
+                <p>{t('equipmentDetail.terms.p10')}</p>
+                <p>{t('equipmentDetail.terms.p11')}</p>
               </div>
             </div>
 
@@ -513,13 +513,13 @@ export function EquipmentDetailPage() {
                 onClick={() => { setAcceptedTerms(true); setShowTermsModal(false); }}
                 className="flex-1 bg-primary text-primary-foreground py-3 rounded-xl font-bold hover:opacity-90 transition-opacity"
               >
-                I Accept These Terms
+                {t('equipmentDetail.terms.accept')}
               </button>
               <button 
                 onClick={() => setShowTermsModal(false)}
                 className="flex-1 bg-muted text-foreground py-3 rounded-xl font-bold hover:bg-muted/80 transition-colors"
               >
-                Close
+                {t('equipmentDetail.terms.close')}
               </button>
             </div>
           </div>

@@ -105,7 +105,7 @@ export const EQUIPMENT_LIST: Equipment[] = [
   },
   {
     id: 401, name: "Fieldking Rotary Tiller",
-    image: "https://images.unsplash.com/photo-1592982537447-7440770cbdi?fit=crop&q=80&w=800",
+    image: "/images/fieldking_rotary_tiller.png",
     distance: "9 km away", price: "₹450", available: true, category: "Rotavator",
     brand: "Fieldking", model_number: "FKRTMG-145", type: "Rotary Tiller", chc_id: 20,
     ownerName: "Anjali Hegde", ownerEmail: "anjali@dalasanuru.in",
@@ -113,7 +113,7 @@ export const EQUIPMENT_LIST: Equipment[] = [
   },
   {
     id: 402, name: "Fieldking Heavy Duty Rotavator",
-    image: "https://images.unsplash.com/photo-1592982537447-7440770cbdi?fit=crop&q=80&w=800",
+    image: "/images/fieldking_heavy_duty_rotavator.png",
     distance: "14 km away", price: "₹550", available: true, category: "Rotavator",
     brand: "Fieldking", model_number: "FKRTMG-175",
     type: "Heavy Duty Rotavator", chc_id: 14,

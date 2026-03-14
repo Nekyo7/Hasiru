@@ -13,9 +13,11 @@ import {
   Equipment
 } from "../utils/equipmentData";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export function ProfilePage() {
   const { user, isAuthenticated } = useAuth();
+  const { t } = useLanguage();
   const [myEquipment, setMyEquipment] = useState<Equipment[]>([]);
   const [sentRequests, setSentRequests] = useState<RentalRequest[]>([]);
   const [receivedRequests, setReceivedRequests] = useState<RentalRequest[]>([]);
@@ -29,7 +31,7 @@ export function ProfilePage() {
   });
 
   const userMeta = user?.user_metadata || {};
-  const userName: string = userMeta.name || userMeta.full_name || user?.email?.split("@")[0] || "Farmer";
+  const userName: string = userMeta.name || userMeta.full_name || user?.email?.split("@")[0] || t('equipmentDetail.farmer');
   const userEmail: string = user?.email || "";
   const userPhone: string = userMeta.phone || "–";
   const userAddress: string = userMeta.address || "–";
@@ -86,9 +88,13 @@ export function ProfilePage() {
       accepted: "bg-green-100 text-green-800",
       declined: "bg-red-100 text-red-800"
     };
+    
+    // Translate status labels
+    const statusLabel = t(`dashboard.status.${status}`);
+
     return (
       <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${map[status] ?? ""}`}>
-        {status}
+        {statusLabel}
       </span>
     );
   };
@@ -98,8 +104,8 @@ export function ProfilePage() {
       <div className="min-h-screen pt-16 flex items-center justify-center">
         <div className="text-center">
           <User className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Please login</h2>
-          <Link to="/login" className="text-primary hover:underline">Sign in to view your profile</Link>
+          <h2 className="text-2xl font-bold mb-2">{t('profile.pleaseLogin')}</h2>
+          <Link to="/login" className="text-primary hover:underline">{t('profile.signinToView')}</Link>
         </div>
       </div>
     );
@@ -131,20 +137,20 @@ export function ProfilePage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <input
                       className="bg-white/10 border-none rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30"
-                      placeholder="Phone Number"
+                      placeholder={t('auth.phoneNumber')}
                       value={editForm.phone}
                       onChange={e => setEditForm({ ...editForm, phone: e.target.value })}
                     />
                     <input
                       className="bg-white/10 border-none rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30"
-                      placeholder="Address"
+                      placeholder={t('auth.address')}
                       value={editForm.address}
                       onChange={e => setEditForm({ ...editForm, address: e.target.value })}
                     />
                   </div>
                   <div className="flex gap-2 mt-4">
-                    <button onClick={handleSaveProfile} className="bg-white text-primary px-4 py-2 rounded-xl text-sm font-bold">Save Changes</button>
-                    <button onClick={() => setIsEditing(false)} className="bg-white/20 text-white px-4 py-2 rounded-xl text-sm font-bold">Cancel</button>
+                    <button onClick={handleSaveProfile} className="bg-white text-primary px-4 py-2 rounded-xl text-sm font-bold">{t('profile.saveChanges')}</button>
+                    <button onClick={() => setIsEditing(false)} className="bg-white/20 text-white px-4 py-2 rounded-xl text-sm font-bold">{t('profile.cancel')}</button>
                   </div>
                 </div>
               ) : (
@@ -162,11 +168,11 @@ export function ProfilePage() {
                     </div>
                     <div className="flex items-center gap-2 bg-white/15 rounded-xl px-3 py-2">
                       <Building2 className="w-4 h-4" />
-                      <span>CHC – {selectedCHC}</span>
+                      <span>{t('chccenters.cardPrefix')}{selectedCHC}</span>
                     </div>
                   </div>
                   <button onClick={() => setIsEditing(true)} className="mt-4 text-xs bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg transition-colors">
-                    Edit Contact Info
+                    {t('profile.editContact')}
                   </button>
                 </>
               )}
@@ -176,11 +182,11 @@ export function ProfilePage() {
             <div className="flex sm:flex-col gap-4 sm:gap-2 sm:items-end">
               <div className="text-center sm:text-right">
                 <p className="text-3xl font-bold">{myEquipment.length}</p>
-                <p className="text-xs text-white/70">Listed</p>
+                <p className="text-xs text-white/70">{t('profile.listed')}</p>
               </div>
               <div className="text-center sm:text-right">
                 <p className="text-3xl font-bold">{receivedRequests.filter(r => r.status === "pending").length}</p>
-                <p className="text-xs text-white/70">Pending</p>
+                <p className="text-xs text-white/70">{t('profile.pending')}</p>
               </div>
             </div>
           </div>
@@ -189,17 +195,17 @@ export function ProfilePage() {
         {/* Tabs */}
         <div className="flex gap-2 mb-6 bg-card rounded-2xl p-1.5 border border-border">
           {[
-            { key: "equipment", label: "My Equipment", icon: Package, count: myEquipment.length },
-            { key: "received", label: "Requests Received", icon: Star, count: receivedRequests.filter(r => r.status === "pending").length },
-            { key: "sent", label: "Requests Sent", icon: Clock, count: sentRequests.length }
+            { key: "equipment", label: t('profile.myEquipment'), icon: Package, count: myEquipment.length },
+            { key: "received", label: t('profile.requestsReceived'), icon: Star, count: receivedRequests.filter(r => r.status === "pending").length },
+            { key: "sent", label: t('profile.requestsSent'), icon: Clock, count: sentRequests.length }
           ].map(tab => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key as any)}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-sm font-medium transition-all ${
                 activeTab === tab.key
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <tab.icon className="w-4 h-4" />
@@ -221,13 +227,13 @@ export function ProfilePage() {
             {myEquipment.length === 0 ? (
               <div className="text-center py-16">
                 <Package className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-xl font-semibold mb-2">No equipment listed yet</h3>
-                <p className="text-muted-foreground mb-6">Share your machinery with local farmers</p>
+                <h3 className="text-xl font-semibold mb-2">{t('profile.noEquipListed')}</h3>
+                <p className="text-muted-foreground mb-6">{t('profile.shareMachinery')}</p>
                 <Link
                   to="/list-equipment"
                   className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity"
                 >
-                  List Your First Machine <ArrowRight className="w-4 h-4" />
+                  {t('profile.listFirstMachine')} <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
             ) : (
@@ -235,10 +241,10 @@ export function ProfilePage() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-muted/50 border-b border-border">
-                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Machine</th>
-                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Category</th>
-                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Price/hr</th>
-                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Status</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.machine')}</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.category')}</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.priceHr')}</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.status')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
@@ -258,7 +264,7 @@ export function ProfilePage() {
                         <td className="px-6 py-4 text-sm font-bold text-primary">{eq.price}</td>
                         <td className="px-6 py-4 text-sm">
                           <div className="flex items-center gap-1.5 text-green-600 font-medium">
-                            <CheckCircle className="w-4 h-4" /> Available
+                            <CheckCircle className="w-4 h-4" /> {t('profile.available')}
                           </div>
                         </td>
                       </tr>
@@ -276,18 +282,18 @@ export function ProfilePage() {
             {receivedRequests.length === 0 ? (
               <div className="text-center py-16">
                 <Star className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-xl font-semibold mb-2">No requests yet</h3>
-                <p className="text-muted-foreground">Farmers will send rental requests for your equipment here</p>
+                <h3 className="text-xl font-semibold mb-2">{t('profile.noRequestsYet')}</h3>
+                <p className="text-muted-foreground">{t('profile.farmersWillSend')}</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-muted/50 border-b border-border">
-                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Equipment & Requester</th>
-                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Contact</th>
-                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Booking Details</th>
-                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Actions</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.machine')} & {t('profile.table.requester')}</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.contact')}</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.bookingDetails')}</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.actions')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
@@ -295,7 +301,7 @@ export function ProfilePage() {
                       <tr key={req.id} className="hover:bg-muted/30 transition-colors">
                         <td className="px-6 py-4">
                           <h4 className="font-bold text-foreground">{req.equipmentName}</h4>
-                          <p className="text-sm text-muted-foreground">Req by: <span className="font-medium">{req.requesterName}</span></p>
+                          <p className="text-sm text-muted-foreground">{t('profile.requestedBy')}: <span className="font-medium">{req.requesterName}</span></p>
                         </td>
                         <td className="px-6 py-4">
                           {req.requesterPhone ? (
@@ -303,13 +309,13 @@ export function ProfilePage() {
                               <Phone className="w-4 h-4" /> {req.requesterPhone}
                             </a>
                           ) : (
-                            <span className="text-muted-foreground text-sm italic">No phone</span>
+                            <span className="text-muted-foreground text-sm italic">{t('profile.table.noPhone')}</span>
                           )}
                         </td>
                         <td className="px-6 py-4 text-sm">
                           <div className="flex flex-col gap-0.5">
                             <span className="flex items-center gap-1 font-medium"><Clock className="w-3.5 h-3.5" /> {req.date}</span>
-                            <span className="text-muted-foreground">{req.hours} hrs @ <span className="font-bold text-foreground">{req.totalPrice}</span></span>
+                            <span className="text-muted-foreground">{req.hours} {t('profile.table.hrsAt')} <span className="font-bold text-foreground">{req.totalPrice}</span></span>
                           </div>
                         </td>
                         <td className="px-6 py-4">
@@ -349,13 +355,13 @@ export function ProfilePage() {
             {sentRequests.length === 0 ? (
               <div className="text-center py-16">
                 <Clock className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-xl font-semibold mb-2">No requests sent</h3>
-                <p className="text-muted-foreground mb-6">Browse equipment and send a booking request</p>
+                <h3 className="text-xl font-semibold mb-2">{t('profile.noRequestsSent')}</h3>
+                <p className="text-muted-foreground mb-6">{t('profile.browseAndSend')}</p>
                 <Link
                   to="/discover"
                   className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity"
                 >
-                  Browse Equipment <ArrowRight className="w-4 h-4" />
+                  {t('profile.browseEquipment')} <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
             ) : (
@@ -363,11 +369,11 @@ export function ProfilePage() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-muted/50 border-b border-border">
-                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Machine</th>
-                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Owner</th>
-                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Date & Hours</th>
-                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Bill Amount</th>
-                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Status</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.machine')}</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.owner')}</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.dateHours')}</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.billAmount')}</th>
+                      <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('profile.table.status')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
@@ -384,11 +390,11 @@ export function ProfilePage() {
                         <td className="px-6 py-4 text-muted-foreground">{req.ownerName}</td>
                         <td className="px-6 py-4">
                           <span className="flex items-center gap-1 font-medium"><Clock className="w-3.5 h-3.5" /> {req.date}</span>
-                          <span className="text-xs text-muted-foreground">{req.hours} hours duration</span>
+                          <span className="text-xs text-muted-foreground">{req.hours} {t('dashboard.hours')}</span>
                         </td>
                         <td className="px-6 py-4 font-bold text-primary">{req.totalPrice}</td>
                         <td className="px-6 py-4">
-                          {statusBadge(req.status)}
+                          {statusBadge(req.status) || <span className="text-muted-foreground">{t('dashboard.status.pending')}</span>}
                         </td>
                       </tr>
                     ))}
