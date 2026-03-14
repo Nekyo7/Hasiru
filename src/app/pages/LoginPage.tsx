@@ -19,12 +19,12 @@ export function LoginPage() {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email.trim() || !emailRegex.test(formData.email)) {
-      newErrors.email = "Valid email is required";
+      newErrors.email = t('auth.valEmail');
     }
 
     const phoneRegex = /^[0-9]{10}$/;
     if (!formData.phone.trim() || !phoneRegex.test(formData.phone.replace(/\D/g, ""))) {
-      newErrors.phone = "Valid 10-digit phone number is required";
+      newErrors.phone = t('auth.valPhone');
     }
 
     setErrors(newErrors);

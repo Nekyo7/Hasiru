@@ -11,7 +11,7 @@ export function ListEquipmentPage() {
   const { t } = useLanguage();
   const { user } = useAuth();
   const userMeta = user?.user_metadata || {};
-  const ownerName: string = userMeta.name || userMeta.full_name || user?.email?.split("@")[0] || "Farmer";
+  const ownerName: string = userMeta.name || userMeta.full_name || user?.email?.split("@")[0] || t('equipmentDetail.farmer');
   const ownerEmail: string = user?.email || "";
   const ownerPhone: string = userMeta.phone || "";
   const [imageFiles, setImageFiles] = useState<File[]>([]);

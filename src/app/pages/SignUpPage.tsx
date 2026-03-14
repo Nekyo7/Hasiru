@@ -44,23 +44,23 @@ export function SignUpPage() {
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
+      newErrors.name = t('auth.valName');
     }
     if (!formData.phone.trim()) {
-      newErrors.phone = "Phone number is required";
+      newErrors.phone = t('auth.valPhone');
     } else if (!/^[0-9]{10}$/.test(formData.phone.replace(/\D/g, ""))) {
-      newErrors.phone = "Please enter a valid 10-digit phone number";
+      newErrors.phone = t('auth.valPhone');
     }
     if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = t('auth.valEmail');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email";
+      newErrors.email = t('auth.valEmail');
     }
     if (!formData.address.trim()) {
-      newErrors.address = "Address is required";
+      newErrors.address = t('auth.valAddress');
     }
     if (!formData.location) {
-      newErrors.location = "Location is required";
+      newErrors.location = t('auth.valLocation');
     }
 
     setErrors(newErrors);
