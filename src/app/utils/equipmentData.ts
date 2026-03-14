@@ -28,6 +28,7 @@ export interface RentalRequest {
   equipmentImage: string;      // equipment_image
   requesterEmail: string;      // requester_email
   requesterName: string;       // requester_name
+  requesterPhone?: string;     // requester_phone
   ownerEmail: string;          // owner_email
   ownerName: string;           // owner_name
   date: string;                // booking_date
@@ -130,6 +131,7 @@ function rowToRequest(row: any): RentalRequest {
     equipmentImage: row.equipment_image || "",
     requesterEmail: row.requester_email,
     requesterName: row.requester_name,
+    requesterPhone: row.requester_phone,
     ownerEmail: row.owner_email,
     ownerName: row.owner_name,
     date: row.booking_date,
@@ -212,6 +214,7 @@ export async function saveRentalRequest(
     equipment_image: request.equipmentImage,
     requester_email: request.requesterEmail,
     requester_name: request.requesterName,
+    requester_phone: request.requesterPhone,
     requester_user_id: userId,
     owner_email: request.ownerEmail,
     owner_name: request.ownerName,

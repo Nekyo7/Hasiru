@@ -20,6 +20,7 @@ export function EquipmentDetailPage() {
 
   const userMeta = user?.user_metadata || {};
   const userName: string = userMeta.name || userMeta.full_name || user?.email?.split("@")[0] || "Farmer";
+  const userPhone: string = userMeta.phone || "";
 
   useEffect(() => {
     if (!id) return;
@@ -50,6 +51,7 @@ export function EquipmentDetailPage() {
       equipmentImage: equipment.image,
       requesterEmail: user.email || "",
       requesterName: userName,
+      requesterPhone: userPhone,
       ownerEmail: equipment.ownerEmail || "admin@hasiru.in",
       ownerName: equipment.ownerName || "CHC Admin",
       date: selectedDate,

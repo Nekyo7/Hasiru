@@ -215,6 +215,15 @@ export function ProfilePage() {
                     <div>
                       <h3 className="font-semibold">{req.equipmentName}</h3>
                       <p className="text-sm text-muted-foreground">Requested by <span className="font-medium text-foreground">{req.requesterName}</span></p>
+                      {req.requesterPhone && (
+                        <a
+                          href={`tel:${req.requesterPhone}`}
+                          className="inline-flex items-center gap-1.5 mt-1 text-sm text-primary hover:underline font-medium"
+                        >
+                          <Phone className="w-3.5 h-3.5" />
+                          {req.requesterPhone}
+                        </a>
+                      )}
                     </div>
                     {statusBadge(req.status)}
                   </div>
