@@ -18,6 +18,7 @@ export function EquipmentDetailPage() {
   const [isRequesting, setIsRequesting] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   const userMeta = user?.user_metadata || {};
   const userName: string = userMeta.name || userMeta.full_name || user?.email?.split("@")[0] || "Farmer";
@@ -177,7 +178,7 @@ export function EquipmentDetailPage() {
                   <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                     <User className="w-3 h-3" /> Verified owner
                   </p>
-                  {equipment.ownerPhone && (
+                  {equipment.ownerPhone ? (
                     <a
                       href={`tel:${equipment.ownerPhone}`}
                       className="inline-flex items-center gap-2 mt-2 text-sm text-primary hover:underline font-medium"
@@ -185,6 +186,10 @@ export function EquipmentDetailPage() {
                       <Phone className="w-4 h-4" />
                       {equipment.ownerPhone}
                     </a>
+                  ) : (
+                    <div className="mt-2 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-md border border-amber-100 inline-block">
+                      Contact info available after booking
+                    </div>
                   )}
                 </div>
               </div>
@@ -244,17 +249,25 @@ export function EquipmentDetailPage() {
                 </div>
 
                 {/* Terms and Conditions */}
-                <div className="mb-6 flex items-start gap-2">
-                  <input
-                    type="checkbox"
-                    id="terms"
-                    checked={acceptedTerms}
-                    onChange={(e) => setAcceptedTerms(e.target.checked)}
-                    className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
-                  />
-                  <label htmlFor="terms" className="text-sm text-muted-foreground leading-tight cursor-pointer">
-                    I agree to the <button type="button" className="text-primary hover:underline">Terms & Conditions</button> for renting this equipment.
-                  </label>
+                <div className={`mb-6 p-4 rounded-xl border-2 transition-all ${acceptedTerms ? "border-green-500/30 bg-green-50/50" : "border-amber-500/30 bg-amber-50/50 shadow-[0_0_15px_rgba(245,158,11,0.1)]"}`}>
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      id="terms"
+                      checked={acceptedTerms}
+                      onChange={(e) => setAcceptedTerms(e.target.checked)}
+                      className="mt-1 h-5 w-5 rounded border-primary/30 text-primary focus:ring-primary cursor-pointer accent-primary"
+                    />
+                    <label htmlFor="terms" className="text-sm font-medium text-foreground leading-snug cursor-pointer select-none">
+                      I have read and agree to the <button onClick={() => setShowTermsModal(true)} type="button" className="text-primary font-bold hover:underline underline-offset-4 decoration-2">Terms & Conditions</button> for renting this equipment.
+                    </label>
+                  </div>
+                  {!acceptedTerms && (
+                    <div className="flex items-center gap-1.5 mt-2.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                      <p className="text-[10px] text-amber-700 uppercase tracking-wider font-extrabold">Requirement: Accept terms to book</p>
+                    </div>
+                  )}
                 </div>
 
                 {requestSent ? (
@@ -291,6 +304,46 @@ export function EquipmentDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Terms and Conditions Modal */}
+      {showTermsModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <div className="bg-card w-full max-w-lg rounded-3xl p-8 shadow-2xl border border-border animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <Shield className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold">Rental Terms & Conditions</h3>
+                <p className="text-sm text-muted-foreground">Please read before booking</p>
+              </div>
+            </div>
+            
+            <div className="space-y-4 max-h-[40vh] overflow-y-auto pr-2 text-sm text-muted-foreground leading-relaxed custom-scrollbar">
+              <p>1. <strong>Usage:</strong> The equipment must only be used for the intended purpose and in accordance with the manufacturer's guidelines.</p>
+              <p>2. <strong>Maintenance:</strong> The Renter is responsible for basic daily maintenance (fuel, oil checks) during the rental period.</p>
+              <p>3. <strong>Damage:</strong> Any damage caused due to negligence will be the liability of the Renter. Existing issues must be reported before start.</p>
+              <p>4. <strong>Return:</strong> Equipment must be returned on time. Late returns may incur additional hourly charges.</p>
+              <p>5. <strong>Insurance:</strong> Base insurance is included, covering standard mechanical failures but not operator errors.</p>
+            </div>
+
+            <div className="mt-8 flex gap-3">
+              <button 
+                onClick={() => { setAcceptedTerms(true); setShowTermsModal(false); }}
+                className="flex-1 bg-primary text-primary-foreground py-3 rounded-xl font-bold hover:opacity-90 transition-opacity"
+              >
+                I Accept These Terms
+              </button>
+              <button 
+                onClick={() => setShowTermsModal(false)}
+                className="flex-1 bg-muted text-foreground py-3 rounded-xl font-bold hover:bg-muted/80 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
