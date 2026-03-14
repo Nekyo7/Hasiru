@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { supabase } from "../../lib/supabase";
 import { Link } from "react-router";
 import { User, Phone, MapPin, Building2, Star, Package, Clock, CheckCircle, XCircle, ArrowRight, Tractor } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
@@ -20,6 +21,12 @@ export function ProfilePage() {
   const [receivedRequests, setReceivedRequests] = useState<RentalRequest[]>([]);
   const [activeTab, setActiveTab] = useState<"equipment" | "sent" | "received">("equipment");
   const [selectedCHC, setSelectedCHC] = useState<string>("–");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    phone: "",
+    address: ""
+  });
 
   const userMeta = user?.user_metadata || {};
   const userName: string = userMeta.name || userMeta.full_name || user?.email?.split("@")[0] || "Farmer";
@@ -49,7 +56,24 @@ export function ProfilePage() {
     load();
     const chc = getSelectedCHC();
     if (chc) setSelectedCHC(chc.name);
-  }, [userEmail]);
+    
+    setEditForm({
+      name: userMeta.name || userMeta.full_name || "",
+      phone: userMeta.phone || "",
+      address: userMeta.address || ""
+    });
+  }, [userEmail, userMeta.name, userMeta.full_name, userMeta.phone, userMeta.address]);
+
+  const handleSaveProfile = async () => {
+    const { error } = await supabase.auth.updateUser({
+      data: {
+        name: editForm.name,
+        phone: editForm.phone,
+        address: editForm.address
+      }
+    });
+    if (!error) setIsEditing(false);
+  };
 
   const handleUpdateStatus = (id: string, status: "accepted" | "declined") => {
     updateRequestStatus(id, status);
@@ -97,22 +121,55 @@ export function ProfilePage() {
             </div>
 
             <div className="flex-1">
-              <h1 className="text-3xl font-bold mb-1">{userName}</h1>
-              <p className="text-white/80 text-sm mb-4">{userEmail}</p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-                <div className="flex items-center gap-2 bg-white/15 rounded-xl px-3 py-2">
-                  <Phone className="w-4 h-4" />
-                  <span>{userPhone}</span>
+              {isEditing ? (
+                <div className="space-y-3">
+                  <input
+                    className="text-3xl font-bold bg-white/10 border-none rounded-lg px-2 w-full text-white placeholder:text-white/30"
+                    value={editForm.name}
+                    onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+                  />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input
+                      className="bg-white/10 border-none rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30"
+                      placeholder="Phone Number"
+                      value={editForm.phone}
+                      onChange={e => setEditForm({ ...editForm, phone: e.target.value })}
+                    />
+                    <input
+                      className="bg-white/10 border-none rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30"
+                      placeholder="Address"
+                      value={editForm.address}
+                      onChange={e => setEditForm({ ...editForm, address: e.target.value })}
+                    />
+                  </div>
+                  <div className="flex gap-2 mt-4">
+                    <button onClick={handleSaveProfile} className="bg-white text-primary px-4 py-2 rounded-xl text-sm font-bold">Save Changes</button>
+                    <button onClick={() => setIsEditing(false)} className="bg-white/20 text-white px-4 py-2 rounded-xl text-sm font-bold">Cancel</button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 bg-white/15 rounded-xl px-3 py-2">
-                  <MapPin className="w-4 h-4" />
-                  <span className="truncate">{userAddress || "–"}</span>
-                </div>
-                <div className="flex items-center gap-2 bg-white/15 rounded-xl px-3 py-2">
-                  <Building2 className="w-4 h-4" />
-                  <span>CHC – {selectedCHC}</span>
-                </div>
-              </div>
+              ) : (
+                <>
+                  <h1 className="text-3xl font-bold mb-1">{userName}</h1>
+                  <p className="text-white/80 text-sm mb-4">{userEmail}</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                    <div className="flex items-center gap-2 bg-white/15 rounded-xl px-3 py-2">
+                      <Phone className="w-4 h-4" />
+                      <span>{userPhone}</span>
+                    </div>
+                    <div className="flex items-center gap-2 bg-white/15 rounded-xl px-3 py-2">
+                      <MapPin className="w-4 h-4" />
+                      <span className="truncate">{userAddress || "–"}</span>
+                    </div>
+                    <div className="flex items-center gap-2 bg-white/15 rounded-xl px-3 py-2">
+                      <Building2 className="w-4 h-4" />
+                      <span>CHC – {selectedCHC}</span>
+                    </div>
+                  </div>
+                  <button onClick={() => setIsEditing(true)} className="mt-4 text-xs bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg transition-colors">
+                    Edit Contact Info
+                  </button>
+                </>
+              )}
             </div>
 
             {/* Stats */}

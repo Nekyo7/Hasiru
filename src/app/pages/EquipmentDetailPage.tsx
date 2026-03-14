@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router";
-import { MapPin, Star, Shield, Calendar, ArrowLeft, User, Loader2, Building2, Send, CheckCircle, Phone } from "lucide-react";
+import { MapPin, Star, Shield, Calendar, ArrowLeft, User, Loader2, Building2, Send, CheckCircle, Phone, XCircle } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { Calendar as CalendarComponent } from "../components/ui/calendar";
 import { getAllEquipment, saveRentalRequest } from "../utils/equipmentData";
@@ -21,6 +21,8 @@ export function EquipmentDetailPage() {
   const [isRequesting, setIsRequesting] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const userMeta = user?.user_metadata || {};
   const userName: string = userMeta.name || userMeta.full_name || user?.email?.split("@")[0] || "Farmer";
@@ -43,28 +45,38 @@ export function EquipmentDetailPage() {
     }
     if (!equipment || !user) return;
 
+    setSubmitError(null);
     setIsRequesting(true);
 
-    const selectedDate = date ? date.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) : "TBD";
-    const priceNum = parseInt(equipment.price.replace(/[^\d]/g, "")) || 0;
-    const total = `₹${priceNum * hours}`;
+    try {
+      const selectedDate = date ? date.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) : "TBD";
+      const priceNum = parseInt(equipment.price.replace(/[^\d]/g, "")) || 0;
+      const total = `₹${priceNum * hours}`;
 
-    const { error } = await saveRentalRequest({
-      equipmentId: equipment.id,
-      equipmentName: equipment.name,
-      equipmentImage: equipment.image,
-      requesterEmail: user.email || "",
-      requesterName: userName,
-      requesterPhone: userPhone,
-      ownerEmail: equipment.ownerEmail || "admin@hasiru.in",
-      ownerName: equipment.ownerName || "CHC Admin",
-      date: selectedDate,
-      hours,
-      totalPrice: total,
-    }, user.id);
+      const { error } = await saveRentalRequest({
+        equipmentId: equipment.id,
+        equipmentName: equipment.name,
+        equipmentImage: equipment.image,
+        requesterEmail: user.email || "",
+        requesterName: userName,
+        requesterPhone: userPhone,
+        ownerEmail: equipment.ownerEmail || "admin@hasiru.in",
+        ownerName: equipment.ownerName || "CHC Admin",
+        date: selectedDate,
+        hours,
+        totalPrice: total,
+      }, user.id);
 
-    setIsRequesting(false);
-    if (!error) setRequestSent(true);
+      if (error) {
+        setSubmitError(error);
+      } else {
+        setRequestSent(true);
+      }
+    } catch (err: any) {
+      setSubmitError(err.message || "An unexpected error occurred. Please try again.");
+    } finally {
+      setIsRequesting(false);
+    }
   };
 
   if (isLoading) {
@@ -180,7 +192,7 @@ export function EquipmentDetailPage() {
                   <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                     <User className="w-3 h-3" /> {t('equipmentDetail.verifiedOwner')}
                   </p>
-                  {equipment.ownerPhone && (
+                  {equipment.ownerPhone ? (
                     <a
                       href={`tel:${equipment.ownerPhone}`}
                       className="inline-flex items-center gap-2 mt-2 text-sm text-primary hover:underline font-medium"
@@ -188,6 +200,10 @@ export function EquipmentDetailPage() {
                       <Phone className="w-4 h-4" />
                       {equipment.ownerPhone}
                     </a>
+                  ) : (
+                    <div className="mt-2 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-md border border-amber-100 inline-block">
+                      Contact info available after booking
+                    </div>
                   )}
                 </div>
               </div>
@@ -246,6 +262,7 @@ export function EquipmentDetailPage() {
                   </div>
                 </div>
 
+<<<<<<< HEAD
                 <div className="mb-6 flex items-start gap-2">
                   <input
                     type="checkbox"
@@ -257,7 +274,36 @@ export function EquipmentDetailPage() {
                   <label htmlFor="terms" className="text-sm text-muted-foreground leading-tight cursor-pointer">
                     {t('equipmentDetail.agreeTo')} <button type="button" className="text-primary hover:underline">{t('equipmentDetail.termsAndConditions')}</button> {t('equipmentDetail.rentingEquipment')}.
                   </label>
+=======
+                {/* Terms and Conditions */}
+                <div className={`mb-6 p-4 rounded-xl border-2 transition-all ${acceptedTerms ? "border-green-500/30 bg-green-50/50" : "border-amber-500/30 bg-amber-50/50 shadow-[0_0_15px_rgba(245,158,11,0.1)]"}`}>
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      id="terms"
+                      checked={acceptedTerms}
+                      onChange={(e) => setAcceptedTerms(e.target.checked)}
+                      className="mt-1 h-5 w-5 rounded border-primary/30 text-primary focus:ring-primary cursor-pointer accent-primary"
+                    />
+                    <label htmlFor="terms" className="text-sm font-medium text-foreground leading-snug cursor-pointer select-none">
+                      I have read and agree to the <button onClick={() => setShowTermsModal(true)} type="button" className="text-primary font-bold hover:underline underline-offset-4 decoration-2">Terms & Conditions</button> for renting this equipment.
+                    </label>
+                  </div>
+                  {!acceptedTerms && (
+                    <div className="flex items-center gap-1.5 mt-2.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                      <p className="text-[10px] text-amber-700 uppercase tracking-wider font-extrabold">Requirement: Accept terms to book</p>
+                    </div>
+                  )}
+>>>>>>> 7798f18c844a95c234b09d3929509f2577f0d7c3
                 </div>
+
+                {submitError && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl flex items-center gap-2 animate-in slide-in-from-top-1">
+                    <XCircle className="w-4 h-4 flex-shrink-0" />
+                    <span>{submitError}</span>
+                  </div>
+                )}
 
                 {requestSent ? (
                   <div className="w-full bg-green-100 text-green-800 py-4 rounded-xl font-semibold flex items-center justify-center gap-2">
@@ -268,12 +314,19 @@ export function EquipmentDetailPage() {
                   <button
                     onClick={handleRequestBooking}
                     disabled={isRequesting || !acceptedTerms}
-                    className="w-full bg-primary text-primary-foreground py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-70 disabled:grayscale flex items-center justify-center gap-2"
+                    className="w-full bg-primary text-primary-foreground py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-70 disabled:grayscale flex items-center justify-center gap-2 relative overflow-hidden group"
                   >
                     {isRequesting ? (
                       <><Loader2 className="w-5 h-5 animate-spin" /> {t('equipmentDetail.sendingRequest')}</>
                     ) : (
+<<<<<<< HEAD
                       <><Send className="w-5 h-5" /> {t('equipmentDetail.requestBooking')}</>
+=======
+                      <>
+                        <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /> 
+                        Request Booking
+                      </>
+>>>>>>> 7798f18c844a95c234b09d3929509f2577f0d7c3
                     )}
                   </button>
                 )}
@@ -293,6 +346,54 @@ export function EquipmentDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Terms and Conditions Modal */}
+      {showTermsModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <div className="bg-card w-full max-w-lg rounded-3xl p-8 shadow-2xl border border-border animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <Shield className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold">Rental Terms & Conditions</h3>
+                <p className="text-sm text-muted-foreground">Please read before booking</p>
+              </div>
+            </div>
+            
+            <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2 text-sm text-muted-foreground leading-relaxed custom-scrollbar">
+              <div className="space-y-4">
+                <p>1. <strong>General:</strong> By requesting to rent equipment through the Smart CHC Network platform, the user agrees to follow all rules and conditions set by the Custom Hiring Center (CHC) and the platform.</p>
+                <p>2. <strong>User Information:</strong> The user must provide correct details including name, phone number, email, and address. Providing false information may lead to cancellation of the request.</p>
+                <p>3. <strong>Availability of Equipment:</strong> All equipment is subject to availability at the selected CHC. Submitting a request does not guarantee confirmation until the CHC approves the booking.</p>
+                <p>4. <strong>Rental Duration:</strong> The user must return the equipment within the approved rental time. Late return may result in extra charges decided by the CHC.</p>
+                <p>5. <strong>Usage Responsibility:</strong> The user must use the equipment only for agricultural purposes. Any damage caused due to misuse will be the responsibility of the user.</p>
+                <p>6. <strong>Damage and Loss:</strong> If equipment is damaged, lost, or returned in poor condition, the user may be required to pay repair or replacement cost as decided by the CHC operator.</p>
+                <p>7. <strong>Payment:</strong> Rental charges will be decided based on machine type, duration, and CHC rules. Payment may be collected at the CHC or during delivery.</p>
+                <p>8. <strong>Cancellation:</strong> The CHC has the right to cancel or reschedule the booking if equipment is not available or due to operational reasons.</p>
+                <p>9. <strong>Contact with CHC:</strong> The user may contact the selected CHC for help, schedule changes, or support.</p>
+                <p>10. <strong>Platform Role:</strong> Smart CHC Network is a digital platform that connects users with Custom Hiring Centers. The platform is not responsible for physical damage, delays, or disputes between user and CHC.</p>
+                <p>11. <strong>Acceptance:</strong> By clicking "Agree and Request", the user confirms that they have read and accepted all terms and conditions.</p>
+              </div>
+            </div>
+
+            <div className="mt-8 flex gap-3">
+              <button 
+                onClick={() => { setAcceptedTerms(true); setShowTermsModal(false); }}
+                className="flex-1 bg-primary text-primary-foreground py-3 rounded-xl font-bold hover:opacity-90 transition-opacity"
+              >
+                I Accept These Terms
+              </button>
+              <button 
+                onClick={() => setShowTermsModal(false)}
+                className="flex-1 bg-muted text-foreground py-3 rounded-xl font-bold hover:bg-muted/80 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
