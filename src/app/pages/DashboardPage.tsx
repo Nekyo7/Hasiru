@@ -21,8 +21,15 @@ export function DashboardPage() {
 
   useEffect(() => {
     if (!userEmail) return;
-    setMyEquipment(getEquipmentByOwner(userEmail));
-    setReceivedRequests(getRequestsForOwner(userEmail));
+    async function load() {
+      const [equip, reqs] = await Promise.all([
+        getEquipmentByOwner(userEmail),
+        getRequestsForOwner(userEmail),
+      ]);
+      setMyEquipment(equip);
+      setReceivedRequests(reqs);
+    }
+    load();
   }, [userEmail]);
 
   const pendingRequests = receivedRequests.filter(r => r.status === "pending");

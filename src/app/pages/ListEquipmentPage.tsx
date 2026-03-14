@@ -13,8 +13,11 @@ export function ListEquipmentPage() {
   const userMeta = user?.user_metadata || {};
   const ownerName: string = userMeta.name || userMeta.full_name || user?.email?.split("@")[0] || "Farmer";
   const ownerEmail: string = user?.email || "";
-  const [images, setImages] = useState<string[]>([]);
+  const ownerPhone: string = userMeta.phone || "";
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     type: "",
@@ -23,41 +26,61 @@ export function ListEquipmentPage() {
     price: "",
     description: ""
   });
-
+  
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      const newImages = Array.from(files).map(file => URL.createObjectURL(file));
-      setImages([...images, ...newImages]);
+      const newFiles = Array.from(files);
+      const newPreviews = newFiles.map(file => URL.createObjectURL(file));
+      setImageFiles([...imageFiles, ...newFiles]);
+      setImagePreviews([...imagePreviews, ...newPreviews]);
     }
   };
 
   const removeImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
+    setImageFiles(imageFiles.filter((_, i) => i !== index));
+    setImagePreviews(imagePreviews.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
     setIsSubmitting(true);
+    setSubmitError(null);
     
-    // Save to local storage
-    saveUserEquipment({
+    let imageUrl = "https://images.unsplash.com/photo-1592982537447-7440770cbdi?fit=crop&q=80&w=800";
+    
+    // Upload image if present
+    if (imageFiles.length > 0) {
+      const { url, error: uploadError } = await import("../utils/equipmentData").then(m => m.uploadEquipmentImage(imageFiles[0]));
+      if (uploadError) {
+        setSubmitError(`${t('listEquipment.imageUploadFailed')}${uploadError}`);
+        setIsSubmitting(false);
+        return;
+      }
+      if (url) imageUrl = url;
+    }
+
+    const { error } = await saveUserEquipment({
       name: formData.name,
-      image: images[0] || "https://images.unsplash.com/photo-1592982537447-7440770cbdi?fit=crop&q=80&w=800",
+      image: imageUrl,
       category: formData.type.charAt(0).toUpperCase() + formData.type.slice(1),
       price: `₹${formData.price}`,
       brand: "User Listed",
-      model_number: "N/A",
+      model_number: t('listEquipment.na'),
       type: formData.description.slice(0, 30),
       chc_id: parseInt(formData.chc),
       ownerName,
       ownerEmail,
-    });
+      ownerPhone,
+    }, user.id);
 
-    setTimeout(() => {
-      setIsSubmitting(false);
+    setIsSubmitting(false);
+    if (error) {
+      setSubmitError(`${t('listEquipment.couldNotSave')}${error}`);
+    } else {
       navigate("/discover");
-    }, 1000);
+    }
   };
 
   return (
@@ -75,7 +98,7 @@ export function ListEquipmentPage() {
             <p className="text-sm text-muted-foreground mb-4">{t('listEquipment.photosDesc')}</p>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-              {images.map((image, index) => (
+              {imagePreviews.map((image, index) => (
                 <div key={index} className="relative aspect-square rounded-xl overflow-hidden group">
                   <img src={image} alt={`Upload ${index + 1}`} className="w-full h-full object-cover" />
                   <button
@@ -120,7 +143,7 @@ export function ListEquipmentPage() {
               >
                 <option value="">{t('listEquipment.selectCenterOpt')}</option>
                 {CHC_CENTERS.map(chc => (
-                  <option key={chc.id} value={chc.id}>CHC – {chc.name}</option>
+                  <option key={chc.id} value={chc.id}>{t('chccenters.cardPrefix')}{chc.name}</option>
                 ))}
               </select>
             </div>

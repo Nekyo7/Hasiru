@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router";
-import { MapPin, Star, Shield, Calendar, ArrowLeft, User, Loader2, Building2, Send, CheckCircle } from "lucide-react";
+import { MapPin, Star, Shield, Calendar, ArrowLeft, User, Loader2, Building2, Send, CheckCircle, Phone } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { Calendar as CalendarComponent } from "../components/ui/calendar";
 import { getAllEquipment, saveRentalRequest } from "../utils/equipmentData";
@@ -20,17 +20,23 @@ export function EquipmentDetailPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isRequesting, setIsRequesting] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const userMeta = user?.user_metadata || {};
   const userName: string = userMeta.name || userMeta.full_name || user?.email?.split("@")[0] || "Farmer";
+  const userPhone: string = userMeta.phone || "";
 
   useEffect(() => {
     if (!id) return;
-    const found = getAllEquipment().find(e => e.id === parseInt(id));
-    if (found) setEquipment(found);
+    async function load() {
+      const all = await getAllEquipment();
+      const found = all.find(e => e.id === parseInt(id!));
+      if (found) setEquipment(found);
+    }
+    load();
   }, [id]);
 
-  const handleRequestBooking = () => {
+  const handleRequestBooking = async () => {
     if (!isAuthenticated) {
       navigate("/login");
       return;
@@ -43,23 +49,22 @@ export function EquipmentDetailPage() {
     const priceNum = parseInt(equipment.price.replace(/[^\d]/g, "")) || 0;
     const total = `₹${priceNum * hours}`;
 
-    saveRentalRequest({
+    const { error } = await saveRentalRequest({
       equipmentId: equipment.id,
       equipmentName: equipment.name,
       equipmentImage: equipment.image,
       requesterEmail: user.email || "",
       requesterName: userName,
+      requesterPhone: userPhone,
       ownerEmail: equipment.ownerEmail || "admin@hasiru.in",
       ownerName: equipment.ownerName || "CHC Admin",
       date: selectedDate,
       hours,
       totalPrice: total,
-    });
+    }, user.id);
 
-    setTimeout(() => {
-      setIsRequesting(false);
-      setRequestSent(true);
-    }, 1200);
+    setIsRequesting(false);
+    if (!error) setRequestSent(true);
   };
 
   if (isLoading) {
@@ -91,12 +96,12 @@ export function EquipmentDetailPage() {
     ],
     description: `Well-maintained ${equipment.name}, perfect for plowing, tilling, and general farm work. Regularly serviced and in excellent working condition. Comes with standard attachments.`,
     specifications: {
-      "Engine Power": "42 HP",
-      "Fuel Type": "Diesel",
-      "Year": "2021",
-      "Condition": "Excellent",
-      "Hours Used": "850 hours",
-      "Transmission": "8 Forward + 2 Reverse"
+      [t('equipmentDetail.enginePower')]: "42 HP",
+      [t('equipmentDetail.fuelType')]: "Diesel",
+      [t('equipmentDetail.year')]: "2021",
+      [t('equipmentDetail.condition')]: "Excellent",
+      [t('equipmentDetail.hoursUsed')]: "850 hours",
+      [t('equipmentDetail.transmission')]: "8 Forward + 2 Reverse"
     },
   };
 
@@ -169,12 +174,21 @@ export function EquipmentDetailPage() {
                     </div>
                     <div className="flex items-center gap-1">
                       <Building2 className="w-4 h-4" />
-                      <span>CHC Center</span>
+                      <span>{t('equipmentDetail.chcCenter')}</span>
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                     <User className="w-3 h-3" /> {t('equipmentDetail.verifiedOwner')}
                   </p>
+                  {equipment.ownerPhone && (
+                    <a
+                      href={`tel:${equipment.ownerPhone}`}
+                      className="inline-flex items-center gap-2 mt-2 text-sm text-primary hover:underline font-medium"
+                    >
+                      <Phone className="w-4 h-4" />
+                      {equipment.ownerPhone}
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
@@ -216,14 +230,13 @@ export function EquipmentDetailPage() {
                     <span className="text-muted-foreground text-sm ml-1">= <span className="font-bold text-foreground">{totalPrice}</span></span>
                   </div>
                 </div>
-
                 {/* Calendar */}
                 <div className="mb-6">
                   <h3 className="font-semibold mb-3 flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     {t('equipmentDetail.selectDate')}
                   </h3>
-                  <div className="bg-background rounded-xl p-2">
+                  <div className="bg-background rounded-xl p-2 border border-border/50">
                     <CalendarComponent
                       mode="single"
                       selected={date}
@@ -231,6 +244,19 @@ export function EquipmentDetailPage() {
                       className="rounded-md"
                     />
                   </div>
+                </div>
+
+                <div className="mb-6 flex items-start gap-2">
+                  <input
+                    type="checkbox"
+                    id="terms"
+                    checked={acceptedTerms}
+                    onChange={(e) => setAcceptedTerms(e.target.checked)}
+                    className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                  />
+                  <label htmlFor="terms" className="text-sm text-muted-foreground leading-tight cursor-pointer">
+                    {t('equipmentDetail.agreeTo')} <button type="button" className="text-primary hover:underline">{t('equipmentDetail.termsAndConditions')}</button> {t('equipmentDetail.rentingEquipment')}.
+                  </label>
                 </div>
 
                 {requestSent ? (
@@ -241,8 +267,8 @@ export function EquipmentDetailPage() {
                 ) : (
                   <button
                     onClick={handleRequestBooking}
-                    disabled={isRequesting}
-                    className="w-full bg-primary text-primary-foreground py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-70 flex items-center justify-center gap-2"
+                    disabled={isRequesting || !acceptedTerms}
+                    className="w-full bg-primary text-primary-foreground py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-70 disabled:grayscale flex items-center justify-center gap-2"
                   >
                     {isRequesting ? (
                       <><Loader2 className="w-5 h-5 animate-spin" /> {t('equipmentDetail.sendingRequest')}</>

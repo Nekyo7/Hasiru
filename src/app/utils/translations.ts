@@ -123,7 +123,17 @@ export const translations = {
       requestSent: "Request Sent! Check your profile.",
       sendingRequest: "Sending Request...",
       requestBooking: "Request Booking",
-      insured: "Equipment insured"
+      insured: "Equipment insured",
+      agreeTo: "I agree to the",
+      termsAndConditions: "Terms & Conditions",
+      rentingEquipment: "for renting this equipment",
+      enginePower: "Engine Power",
+      fuelType: "Fuel Type",
+      year: "Year",
+      condition: "Condition",
+      hoursUsed: "Hours Used",
+      transmission: "Transmission",
+      chcCenter: "CHC Center"
     },
     listEquipment: {
       title: "List Your Equipment",
@@ -148,6 +158,9 @@ export const translations = {
       listingBtn: "Listing Equipment...",
       listEquipBtn: "List Equipment",
       cancelBtn: "Cancel",
+      imageUploadFailed: "Image upload failed: ",
+      couldNotSave: "Could not save: ",
+      na: "N/A",
       types: {
         tractor: "Tractor",
         harvester: "Harvester",
@@ -330,7 +343,17 @@ export const translations = {
       requestSent: "ವಿನಂತಿಯನ್ನು ಕಳುಹಿಸಲಾಗಿದೆ! ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಅನ್ನು ಪರಿಶೀಲಿಸಿ.",
       sendingRequest: "ವಿನಂತಿಯನ್ನು ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ...",
       requestBooking: "ಬುಕಿಂಗ್ ವಿನಂತಿಸಿ",
-      insured: "ಉಪಕರಣಗಳನ್ನು ವಿಮೆ ಮಾಡಲಾಗಿದೆ"
+      insured: "ಉಪಕರಣಗಳನ್ನು ವಿಮೆ ಮಾಡಲಾಗಿದೆ",
+      agreeTo: "ನಾನು ಈ ಕೆಳಗಿನವುಗಳಿಗೆ ಒಪ್ಪುತ್ತೇನೆ",
+      termsAndConditions: "ನಿಯಮಗಳು ಮತ್ತು ನಿಬಂಧನೆಗಳು",
+      rentingEquipment: "ಈ ಉಪಕರಣವನ್ನು ಬಾಡಿಗೆಗೆ ಪಡೆಯಲು",
+      enginePower: "ಎಂಜಿನ್ ಶಕ್ತಿ",
+      fuelType: "ಇಂಧನ ಪ್ರಕಾರ",
+      year: "ವರ್ಷ",
+      condition: "ಸ್ಥಿತಿ",
+      hoursUsed: "ಬಳಸಿದ ಗಂಟೆಗಳು",
+      transmission: "ಟ್ರಾನ್ಸ್ಮಿಷನ್",
+      chcCenter: "ಸಿಎಚ್‌ಸಿ ಕೇಂದ್ರ"
     },
     listEquipment: {
       title: "ನಿಮ್ಮ ಉಪಕರಣವನ್ನು ಪಟ್ಟಿ ಮಾಡಿ",
@@ -355,6 +378,9 @@ export const translations = {
       listingBtn: "ಉಪಕರಣವನ್ನು ಪಟ್ಟಿ ಮಾಡಲಾಗುತ್ತಿದೆ...",
       listEquipBtn: "ಉಪಕರಣವನ್ನು ಪಟ್ಟಿ ಮಾಡಿ",
       cancelBtn: "ರದ್ದುಗೊಳಿಸಿ",
+      imageUploadFailed: "ಚಿತ್ರ ಅಪ್‌ಲೋಡ್ ವಿಫಲವಾಗಿದೆ: ",
+      couldNotSave: "ಉಳಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ: ",
+      na: "ಲಭ್ಯವಿಲ್ಲ",
       types: {
         tractor: "ಟ್ರ್ಯಾಕ್ಟರ್",
         harvester: "ಕೊಯ್ಲು ಯಂತ್ರ",
