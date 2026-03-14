@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router";
-import { Tractor, Map, LayoutDashboard, Plus, Building2, BookOpen, User, LogOut } from "lucide-react";
+import { Tractor, LayoutDashboard, Plus, Building2, BookOpen, User, LogOut, UserCircle } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { clearSetupSession } from "../utils/auth";
@@ -99,6 +99,14 @@ export function Navigation() {
                     </div>
 
                     {/* Menu Items */}
+                    <Link
+                      to="/profile"
+                      className="flex items-center gap-2 px-4 py-3 hover:bg-muted transition-colors text-foreground text-sm"
+                      onClick={() => setShowDropdown(false)}
+                    >
+                      <UserCircle className="w-4 h-4" />
+                      My Profile
+                    </Link>
                     <Link
                       to="/dashboard"
                       className="flex items-center gap-2 px-4 py-3 hover:bg-muted transition-colors text-foreground text-sm"

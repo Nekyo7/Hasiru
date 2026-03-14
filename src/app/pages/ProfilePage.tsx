@@ -1,0 +1,285 @@
+import { useState, useEffect } from "react";
+import { Link } from "react-router";
+import { User, Phone, MapPin, Building2, Star, Package, Clock, CheckCircle, XCircle, ArrowRight, Tractor } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { getSelectedCHC } from "../utils/auth";
+import {
+  getEquipmentByOwner,
+  getRequestsByRequester,
+  getRequestsForOwner,
+  updateRequestStatus,
+  RentalRequest,
+  Equipment
+} from "../utils/equipmentData";
+import { ImageWithFallback } from "../components/figma/ImageWithFallback";
+
+export function ProfilePage() {
+  const { user, isAuthenticated } = useAuth();
+  const [myEquipment, setMyEquipment] = useState<Equipment[]>([]);
+  const [sentRequests, setSentRequests] = useState<RentalRequest[]>([]);
+  const [receivedRequests, setReceivedRequests] = useState<RentalRequest[]>([]);
+  const [activeTab, setActiveTab] = useState<"equipment" | "sent" | "received">("equipment");
+  const [selectedCHC, setSelectedCHC] = useState<string>("–");
+
+  const userMeta = user?.user_metadata || {};
+  const userName: string = userMeta.name || userMeta.full_name || user?.email?.split("@")[0] || "Farmer";
+  const userEmail: string = user?.email || "";
+  const userPhone: string = userMeta.phone || "–";
+  const userAddress: string = userMeta.address || "–";
+
+  const initials = userName
+    .split(" ")
+    .map((w: string) => w[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+
+  useEffect(() => {
+    if (!userEmail) return;
+    setMyEquipment(getEquipmentByOwner(userEmail));
+    setSentRequests(getRequestsByRequester(userEmail));
+    setReceivedRequests(getRequestsForOwner(userEmail));
+    const chc = getSelectedCHC();
+    if (chc) setSelectedCHC(chc.name);
+  }, [userEmail]);
+
+  const handleUpdateStatus = (id: string, status: "accepted" | "declined") => {
+    updateRequestStatus(id, status);
+    setReceivedRequests(prev => prev.map(r => r.id === id ? { ...r, status } : r));
+  };
+
+  const statusBadge = (status: string) => {
+    const map: Record<string, string> = {
+      pending: "bg-yellow-100 text-yellow-800",
+      accepted: "bg-green-100 text-green-800",
+      declined: "bg-red-100 text-red-800"
+    };
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${map[status] ?? ""}`}>
+        {status}
+      </span>
+    );
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen pt-16 flex items-center justify-center">
+        <div className="text-center">
+          <User className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+          <h2 className="text-2xl font-bold mb-2">Please login</h2>
+          <Link to="/login" className="text-primary hover:underline">Sign in to view your profile</Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen pt-16 bg-background">
+      <div className="max-w-5xl mx-auto px-4 py-10">
+
+        {/* Profile Header Card */}
+        <div className="bg-gradient-to-br from-primary to-primary/70 rounded-3xl p-8 mb-8 text-primary-foreground relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <Tractor className="w-64 h-64 -mr-16 -mt-16" />
+          </div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 relative z-10">
+            {/* Avatar */}
+            <div className="w-24 h-24 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
+              <span className="text-4xl font-bold text-white">{initials}</span>
+            </div>
+
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold mb-1">{userName}</h1>
+              <p className="text-white/80 text-sm mb-4">{userEmail}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                <div className="flex items-center gap-2 bg-white/15 rounded-xl px-3 py-2">
+                  <Phone className="w-4 h-4" />
+                  <span>{userPhone}</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/15 rounded-xl px-3 py-2">
+                  <MapPin className="w-4 h-4" />
+                  <span className="truncate">{userAddress || "–"}</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/15 rounded-xl px-3 py-2">
+                  <Building2 className="w-4 h-4" />
+                  <span>CHC – {selectedCHC}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="flex sm:flex-col gap-4 sm:gap-2 sm:items-end">
+              <div className="text-center sm:text-right">
+                <p className="text-3xl font-bold">{myEquipment.length}</p>
+                <p className="text-xs text-white/70">Listed</p>
+              </div>
+              <div className="text-center sm:text-right">
+                <p className="text-3xl font-bold">{receivedRequests.filter(r => r.status === "pending").length}</p>
+                <p className="text-xs text-white/70">Pending</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-2 mb-6 bg-card rounded-2xl p-1.5 border border-border">
+          {[
+            { key: "equipment", label: "My Equipment", icon: Package, count: myEquipment.length },
+            { key: "received", label: "Requests Received", icon: Star, count: receivedRequests.filter(r => r.status === "pending").length },
+            { key: "sent", label: "Requests Sent", icon: Clock, count: sentRequests.length }
+          ].map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key as any)}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-sm font-medium transition-all ${
+                activeTab === tab.key
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <tab.icon className="w-4 h-4" />
+              <span className="hidden sm:inline">{tab.label}</span>
+              {tab.count > 0 && (
+                <span className={`w-5 h-5 rounded-full text-xs flex items-center justify-center font-bold ${
+                  activeTab === tab.key ? "bg-white/20" : "bg-primary/10 text-primary"
+                }`}>
+                  {tab.count}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab: My Equipment */}
+        {activeTab === "equipment" && (
+          <div>
+            {myEquipment.length === 0 ? (
+              <div className="text-center py-16 bg-card rounded-2xl border border-border">
+                <Package className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-xl font-semibold mb-2">No equipment listed yet</h3>
+                <p className="text-muted-foreground mb-6">Share your machinery with local farmers</p>
+                <Link
+                  to="/list-equipment"
+                  className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity"
+                >
+                  List Your First Machine <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {myEquipment.map(eq => (
+                  <div key={eq.id} className="bg-card rounded-2xl overflow-hidden border border-border flex">
+                    <div className="w-1/3 aspect-square overflow-hidden flex-shrink-0">
+                      <ImageWithFallback
+                        src={eq.image}
+                        alt={eq.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 p-4">
+                      <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">{eq.category}</span>
+                      <h3 className="font-semibold mt-1 mb-1">{eq.name}</h3>
+                      <p className="text-sm font-bold text-primary">{eq.price}<span className="text-muted-foreground font-normal">/hr</span></p>
+                      <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3 text-green-500" /> Available
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Tab: Requests Received */}
+        {activeTab === "received" && (
+          <div className="space-y-4">
+            {receivedRequests.length === 0 ? (
+              <div className="text-center py-16 bg-card rounded-2xl border border-border">
+                <Star className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-xl font-semibold mb-2">No requests yet</h3>
+                <p className="text-muted-foreground">Farmers will send rental requests for your equipment here</p>
+              </div>
+            ) : (
+              receivedRequests.map(req => (
+                <div key={req.id} className="bg-card rounded-2xl p-5 border border-border">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h3 className="font-semibold">{req.equipmentName}</h3>
+                      <p className="text-sm text-muted-foreground">Requested by <span className="font-medium text-foreground">{req.requesterName}</span></p>
+                    </div>
+                    {statusBadge(req.status)}
+                  </div>
+                  <div className="flex gap-4 text-sm text-muted-foreground mb-4">
+                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {req.date}</span>
+                    <span>{req.hours} hours</span>
+                    <span className="font-semibold text-foreground">{req.totalPrice}</span>
+                  </div>
+                  {req.status === "pending" && (
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => handleUpdateStatus(req.id, "accepted")}
+                        className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity"
+                      >
+                        <CheckCircle className="w-4 h-4" /> Accept
+                      </button>
+                      <button
+                        onClick={() => handleUpdateStatus(req.id, "declined")}
+                        className="flex-1 flex items-center justify-center gap-2 bg-muted text-foreground py-2.5 rounded-xl text-sm font-semibold hover:bg-muted/80 transition-colors"
+                      >
+                        <XCircle className="w-4 h-4" /> Decline
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {/* Tab: Requests Sent */}
+        {activeTab === "sent" && (
+          <div className="space-y-4">
+            {sentRequests.length === 0 ? (
+              <div className="text-center py-16 bg-card rounded-2xl border border-border">
+                <Clock className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-xl font-semibold mb-2">No requests sent</h3>
+                <p className="text-muted-foreground mb-6">Browse equipment and send a booking request</p>
+                <Link
+                  to="/discover"
+                  className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity"
+                >
+                  Browse Equipment <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            ) : (
+              sentRequests.map(req => (
+                <div key={req.id} className="bg-card rounded-2xl p-5 border border-border flex gap-4 items-start">
+                  <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
+                    <ImageWithFallback
+                      src={req.equipmentImage}
+                      alt={req.equipmentName}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between">
+                      <h3 className="font-semibold">{req.equipmentName}</h3>
+                      {statusBadge(req.status)}
+                    </div>
+                    <p className="text-sm text-muted-foreground">Owner: <span className="font-medium text-foreground">{req.ownerName}</span></p>
+                    <div className="flex gap-4 text-sm text-muted-foreground mt-1">
+                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {req.date}</span>
+                      <span>{req.hours} hours</span>
+                      <span className="font-bold text-foreground">{req.totalPrice}</span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

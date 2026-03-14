@@ -11,6 +11,8 @@ export interface Equipment {
   model_number?: string;
   type?: string;
   chc_id: number; // Associated CHC center ID
+  ownerName?: string;
+  ownerEmail?: string;
 }
 
 export const EQUIPMENT_LIST: Equipment[] = [
@@ -24,7 +26,9 @@ export const EQUIPMENT_LIST: Equipment[] = [
     category: "Tractor",
     brand: "Mahindra",
     model_number: "575DI",
-    chc_id: 14 // GKVK
+    chc_id: 14,
+    ownerName: "Ravi Kumar",
+    ownerEmail: "ravi@gkvk.in"
   },
   {
     id: 102,
@@ -36,7 +40,9 @@ export const EQUIPMENT_LIST: Equipment[] = [
     category: "Tractor",
     brand: "John Deere",
     model_number: "5105",
-    chc_id: 15 // Uddurkaval
+    chc_id: 15,
+    ownerName: "Suresh Patil",
+    ownerEmail: "suresh@uddurkaval.in"
   },
   {
     id: 103,
@@ -48,7 +54,9 @@ export const EQUIPMENT_LIST: Equipment[] = [
     category: "Tractor",
     brand: "Swaraj",
     model_number: "744FE",
-    chc_id: 16 // Doddaballapura
+    chc_id: 16,
+    ownerName: "Mohan Reddy",
+    ownerEmail: "mohan@doddaballapura.in"
   },
   {
     id: 201,
@@ -61,7 +69,9 @@ export const EQUIPMENT_LIST: Equipment[] = [
     brand: "Claas",
     model_number: "Crop Tiger 30 Terra Trac",
     type: "Multi-crop combine harvester",
-    chc_id: 20 // Dalasanuru
+    chc_id: 20,
+    ownerName: "Anjali Hegde",
+    ownerEmail: "anjali@dalasanuru.in"
   },
   {
     id: 202,
@@ -74,7 +84,9 @@ export const EQUIPMENT_LIST: Equipment[] = [
     brand: "Kubota",
     model_number: "DC-68G-HK",
     type: "Paddy combine harvester",
-    chc_id: 14 // GKVK
+    chc_id: 14,
+    ownerName: "Ravi Kumar",
+    ownerEmail: "ravi@gkvk.in"
   },
   {
     id: 301,
@@ -87,7 +99,9 @@ export const EQUIPMENT_LIST: Equipment[] = [
     brand: "Fieldking",
     model_number: "FKSD-9",
     type: "Seed Drill",
-    chc_id: 15 // Uddurkaval
+    chc_id: 15,
+    ownerName: "Suresh Patil",
+    ownerEmail: "suresh@uddurkaval.in"
   },
   {
     id: 302,
@@ -100,7 +114,9 @@ export const EQUIPMENT_LIST: Equipment[] = [
     brand: "Fieldking",
     model_number: "FKMSD-13",
     type: "Multi Crop Seed Drill",
-    chc_id: 16 // Doddaballapura
+    chc_id: 16,
+    ownerName: "Mohan Reddy",
+    ownerEmail: "mohan@doddaballapura.in"
   },
   {
     id: 401,
@@ -113,11 +129,13 @@ export const EQUIPMENT_LIST: Equipment[] = [
     brand: "Fieldking",
     model_number: "FKRTMG-145",
     type: "Rotary Tiller",
-    chc_id: 20 // Dalasanuru
+    chc_id: 20,
+    ownerName: "Anjali Hegde",
+    ownerEmail: "anjali@dalasanuru.in"
   },
   {
     id: 402,
-    name: "Fieldking heavy Duty rotavator",
+    name: "Fieldking Heavy Duty Rotavator",
     image: "https://images.unsplash.com/photo-1592982537447-7440770cbdi?fit=crop&q=80&w=800",
     distance: "14 km away",
     price: "₹550",
@@ -126,29 +144,30 @@ export const EQUIPMENT_LIST: Equipment[] = [
     brand: "Fieldking",
     model_number: "FKRTMG-175",
     type: "Heavy Duty Rotavator",
-    chc_id: 14 // GKVK
+    chc_id: 14,
+    ownerName: "Ravi Kumar",
+    ownerEmail: "ravi@gkvk.in"
   }
 ];
 
-// Local storage key
+// ─── Equipment Local Storage ───────────────────────────────────────────────────
+
 const USER_EQUIPMENT_KEY = "user_listed_equipment";
 
-// Save a new piece of equipment to local storage
 export function saveUserEquipment(equipment: Omit<Equipment, "id" | "available" | "distance">): void {
   const existing = getUserEquipment();
   const newId = 5000 + existing.length + Math.floor(Math.random() * 1000);
-  
+
   const newEquipment: Equipment = {
     ...equipment,
     id: newId,
     available: true,
     distance: "Your Location"
   };
-  
+
   localStorage.setItem(USER_EQUIPMENT_KEY, JSON.stringify([...existing, newEquipment]));
 }
 
-// Get equipment from local storage
 export function getUserEquipment(chcId?: number): Equipment[] {
   const data = localStorage.getItem(USER_EQUIPMENT_KEY);
   if (!data) return [];
@@ -156,15 +175,82 @@ export function getUserEquipment(chcId?: number): Equipment[] {
     const equipment: Equipment[] = JSON.parse(data);
     return chcId ? equipment.filter(e => e.chc_id === chcId) : equipment;
   } catch (e) {
-    console.error("Error parsing user equipment from localStorage", e);
     return [];
   }
 }
 
-// Get all equipment (merged and filtered by CHC)
+export function getEquipmentByOwner(ownerEmail: string): Equipment[] {
+  const allUserListed = getUserEquipment();
+  return allUserListed.filter(e => e.ownerEmail === ownerEmail);
+}
+
 export function getAllEquipment(chcId?: number): Equipment[] {
-  const masterList = chcId 
+  const masterList = chcId
     ? EQUIPMENT_LIST.filter(e => e.chc_id === chcId)
     : EQUIPMENT_LIST;
   return [...getUserEquipment(chcId), ...masterList];
+}
+
+export function getEquipmentById(id: number): Equipment | undefined {
+  return getAllEquipment().find(e => e.id === id);
+}
+
+// ─── Rental Request System ─────────────────────────────────────────────────────
+
+export type RequestStatus = "pending" | "accepted" | "declined";
+
+export interface RentalRequest {
+  id: string;
+  equipmentId: number;
+  equipmentName: string;
+  equipmentImage: string;
+  // Requester (person who wants to rent)
+  requesterEmail: string;
+  requesterName: string;
+  // Owner (person who listed the equipment)
+  ownerEmail: string;
+  ownerName: string;
+  // Booking details
+  date: string;
+  hours: number;
+  totalPrice: string;
+  status: RequestStatus;
+  createdAt: string;
+}
+
+const REQUESTS_KEY = "rental_requests";
+
+export function saveRentalRequest(request: Omit<RentalRequest, "id" | "createdAt" | "status">): void {
+  const existing = getRentalRequests();
+  const newRequest: RentalRequest = {
+    ...request,
+    id: `req_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+    status: "pending",
+    createdAt: new Date().toISOString()
+  };
+  localStorage.setItem(REQUESTS_KEY, JSON.stringify([...existing, newRequest]));
+}
+
+export function getRentalRequests(): RentalRequest[] {
+  const data = localStorage.getItem(REQUESTS_KEY);
+  if (!data) return [];
+  try {
+    return JSON.parse(data);
+  } catch {
+    return [];
+  }
+}
+
+export function getRequestsForOwner(ownerEmail: string): RentalRequest[] {
+  return getRentalRequests().filter(r => r.ownerEmail === ownerEmail);
+}
+
+export function getRequestsByRequester(requesterEmail: string): RentalRequest[] {
+  return getRentalRequests().filter(r => r.requesterEmail === requesterEmail);
+}
+
+export function updateRequestStatus(requestId: string, status: RequestStatus): void {
+  const requests = getRentalRequests();
+  const updated = requests.map(r => r.id === requestId ? { ...r, status } : r);
+  localStorage.setItem(REQUESTS_KEY, JSON.stringify(updated));
 }

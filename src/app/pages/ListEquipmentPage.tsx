@@ -3,9 +3,14 @@ import { useNavigate } from "react-router";
 import { Upload, X, MapPin, IndianRupee, Store, CheckCircle2 } from "lucide-react";
 import { CHC_CENTERS } from "../utils/auth";
 import { saveUserEquipment } from "../utils/equipmentData";
+import { useAuth } from "../contexts/AuthContext";
 
 export function ListEquipmentPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const userMeta = user?.user_metadata || {};
+  const ownerName: string = userMeta.name || userMeta.full_name || user?.email?.split("@")[0] || "Farmer";
+  const ownerEmail: string = user?.email || "";
   const [images, setImages] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -33,7 +38,7 @@ export function ListEquipmentPage() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate save to local storage
+    // Save to local storage
     saveUserEquipment({
       name: formData.name,
       image: images[0] || "https://images.unsplash.com/photo-1592982537447-7440770cbdi?fit=crop&q=80&w=800",
@@ -42,7 +47,9 @@ export function ListEquipmentPage() {
       brand: "User Listed",
       model_number: "N/A",
       type: formData.description.slice(0, 30),
-      chc_id: parseInt(formData.chc) // Pass the selected CHC ID
+      chc_id: parseInt(formData.chc),
+      ownerName,
+      ownerEmail,
     });
 
     setTimeout(() => {

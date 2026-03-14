@@ -10,6 +10,7 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { MapViewPage } from "./pages/MapViewPage";
 import { LoginPage } from "./pages/LoginPage";
 import { CHCSelectionPage } from "./pages/CHCSelectionPage";
+import { ProfilePage } from "./pages/ProfilePage";
 import { ErrorPage } from "./pages/ErrorPage";
 
 export const router = createBrowserRouter([
@@ -28,6 +29,7 @@ export const router = createBrowserRouter([
       { path: "list-equipment", Component: ListEquipmentPage },
       { path: "dashboard", Component: DashboardPage },
       { path: "map", Component: MapViewPage },
+      { path: "profile", Component: ProfilePage },
     ],
   },
 ]);
