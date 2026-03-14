@@ -262,19 +262,6 @@ export function EquipmentDetailPage() {
                   </div>
                 </div>
 
-<<<<<<< HEAD
-                <div className="mb-6 flex items-start gap-2">
-                  <input
-                    type="checkbox"
-                    id="terms"
-                    checked={acceptedTerms}
-                    onChange={(e) => setAcceptedTerms(e.target.checked)}
-                    className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
-                  />
-                  <label htmlFor="terms" className="text-sm text-muted-foreground leading-tight cursor-pointer">
-                    {t('equipmentDetail.agreeTo')} <button type="button" className="text-primary hover:underline">{t('equipmentDetail.termsAndConditions')}</button> {t('equipmentDetail.rentingEquipment')}.
-                  </label>
-=======
                 {/* Terms and Conditions */}
                 <div className={`mb-6 p-4 rounded-xl border-2 transition-all ${acceptedTerms ? "border-green-500/30 bg-green-50/50" : "border-amber-500/30 bg-amber-50/50 shadow-[0_0_15px_rgba(245,158,11,0.1)]"}`}>
                   <div className="flex items-start gap-3">
@@ -286,7 +273,7 @@ export function EquipmentDetailPage() {
                       className="mt-1 h-5 w-5 rounded border-primary/30 text-primary focus:ring-primary cursor-pointer accent-primary"
                     />
                     <label htmlFor="terms" className="text-sm font-medium text-foreground leading-snug cursor-pointer select-none">
-                      I have read and agree to the <button onClick={() => setShowTermsModal(true)} type="button" className="text-primary font-bold hover:underline underline-offset-4 decoration-2">Terms & Conditions</button> for renting this equipment.
+                      {t('equipmentDetail.agreeTo')} <button onClick={() => setShowTermsModal(true)} type="button" className="text-primary font-bold hover:underline underline-offset-4 decoration-2">{t('equipmentDetail.termsAndConditions')}</button> {t('equipmentDetail.rentingEquipment')}.
                     </label>
                   </div>
                   {!acceptedTerms && (
@@ -295,7 +282,6 @@ export function EquipmentDetailPage() {
                       <p className="text-[10px] text-amber-700 uppercase tracking-wider font-extrabold">Requirement: Accept terms to book</p>
                     </div>
                   )}
->>>>>>> 7798f18c844a95c234b09d3929509f2577f0d7c3
                 </div>
 
                 {submitError && (
@@ -319,14 +305,10 @@ export function EquipmentDetailPage() {
                     {isRequesting ? (
                       <><Loader2 className="w-5 h-5 animate-spin" /> {t('equipmentDetail.sendingRequest')}</>
                     ) : (
-<<<<<<< HEAD
-                      <><Send className="w-5 h-5" /> {t('equipmentDetail.requestBooking')}</>
-=======
                       <>
                         <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /> 
-                        Request Booking
+                        {t('equipmentDetail.requestBooking')}
                       </>
->>>>>>> 7798f18c844a95c234b09d3929509f2577f0d7c3
                     )}
                   </button>
                 )}
