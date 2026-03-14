@@ -258,3 +258,28 @@ export async function updateRequestStatus(
     .update({ status })
     .eq("id", requestId);
 }
+
+// ─── Storage API ───────────────────────────────────────────────────
+
+/** 
+ * Upload an image to Supabase Storage and return the public URL 
+ */
+export async function uploadEquipmentImage(file: File): Promise<{ url: string | null; error: string | null }> {
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+  const filePath = `${fileName}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('equipment-images')
+    .upload(filePath, file);
+
+  if (uploadError) {
+    return { url: null, error: uploadError.message };
+  }
+
+  const { data } = supabase.storage
+    .from('equipment-images')
+    .getPublicUrl(filePath);
+
+  return { url: data.publicUrl, error: null };
+}
