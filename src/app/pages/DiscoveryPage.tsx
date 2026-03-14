@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
-import { MapPin, Filter, Search, Tractor, ArrowLeft, Loader2 } from "lucide-react";
+import { MapPin, Filter, Search, Tractor, ArrowLeft, Loader2, ArrowRight } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { getSelectedCHC } from "../utils/auth";
 import { getAllEquipment } from "../utils/equipmentData";
@@ -100,97 +100,52 @@ export function DiscoveryPage() {
         </div>
       </div>
 
-      <div className="flex h-[calc(100vh-8rem)]">
-        {/* Equipment List */}
-        <div className="w-full lg:w-1/2 overflow-y-auto px-4 py-6">
-          <div className="max-w-2xl mx-auto space-y-4">
-            {filteredEquipment.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground">
-                No equipment available at the moment.
-              </div>
-            ) : (
-              filteredEquipment.map((equipment) => (
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredEquipment.length === 0 ? (
+            <div className="col-span-1 md:col-span-2 lg:col-span-3 text-center py-12 text-muted-foreground">
+              No equipment available at the moment.
+            </div>
+          ) : (
+            filteredEquipment.map((equipment) => (
               <Link
                 key={equipment.id}
                 to={`/equipment/${equipment.id}`}
-                onMouseEnter={() => setSelectedEquipment(equipment.id)}
-                onMouseLeave={() => setSelectedEquipment(null)}
-                className={`block bg-card rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all ${
-                  selectedEquipment === equipment.id ? "ring-2 ring-primary" : ""
-                }`}
+                className="group bg-card rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all hover:-translate-y-1"
               >
-                <div className="sm:flex">
-                  <div className="sm:w-2/5 aspect-[4/3] sm:aspect-auto overflow-hidden">
-                    <ImageWithFallback
-                      src={equipment.image}
-                      alt={equipment.name}
-                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                    />
-                  </div>
-                  <div className="sm:w-3/5 p-5">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="text-xl font-semibold text-foreground">{equipment.name}</h3>
-                      {equipment.available && (
-                        <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap">
-                          Available
-                        </span>
-                      )}
+                <div className="aspect-[4/3] overflow-hidden relative">
+                  <ImageWithFallback
+                    src={equipment.image}
+                    alt={equipment.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                  {equipment.available && (
+                    <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">
+                      Available
                     </div>
-                    <div className="flex items-center gap-2 text-muted-foreground mb-4">
+                  )}
+                </div>
+                <div className="p-5">
+                  <h3 className="text-xl font-semibold text-foreground mb-3">{equipment.name}</h3>
+                  <div className="flex items-center gap-4 text-muted-foreground mb-4">
+                    <div className="flex items-center gap-1">
                       <MapPin className="w-4 h-4" />
                       <span className="text-sm">{equipment.distance}</span>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-2xl font-bold text-foreground">{equipment.price}</span>
-                        <span className="text-muted-foreground">/hour</span>
-                      </div>
-                      <span className="text-primary font-medium hover:underline">View details →</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-2xl font-bold text-foreground">{equipment.price}</span>
+                      <span className="text-muted-foreground">/hour</span>
                     </div>
+                    <span className="text-primary font-medium hover:underline flex items-center gap-1">
+                      View details <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </span>
                   </div>
                 </div>
               </Link>
-            )))}
-          </div>
-        </div>
-
-        {/* Map View */}
-        <div className="hidden lg:block w-1/2 sticky top-32 h-[calc(100vh-8rem)]">
-          <div className="h-full bg-muted rounded-l-2xl relative overflow-hidden">
-            {/* Mock Map Background */}
-            <ImageWithFallback
-              src="https://images.unsplash.com/photo-1689585190795-3352640d5401?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwbG93ZWQlMjBmaWVsZCUyMHBhdHRlcm58ZW58MXx8fHwxNzczMzg5MzQyfDA&ixlib=rb-4.1.0&q=80&w=1080"
-              alt="Map background"
-              className="w-full h-full object-cover opacity-20"
-            />
-            
-            {/* Map Markers */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <div className="bg-primary rounded-full p-6 mb-4 inline-block animate-pulse">
-                  <Tractor className="w-12 h-12 text-primary-foreground" />
-                </div>
-                <p className="text-foreground font-medium text-lg">Interactive map showing nearby equipment</p>
-                <p className="text-muted-foreground mt-2">Hover over listings to see locations</p>
-              </div>
-            </div>
-
-            {/* Marker Indicators */}
-            {filteredEquipment.slice(0, 5).map((equipment, index) => (
-              <div
-                key={equipment.id}
-                className={`absolute bg-primary rounded-full p-2 cursor-pointer transition-all ${
-                  selectedEquipment === equipment.id ? "scale-125 ring-4 ring-secondary" : "hover:scale-110"
-                }`}
-                style={{
-                  top: `${20 + index * 15}%`,
-                  left: `${30 + index * 10}%`,
-                }}
-              >
-                <Tractor className="w-4 h-4 text-primary-foreground" />
-              </div>
-            ))}
-          </div>
+            ))
+          )}
         </div>
       </div>
     </div>

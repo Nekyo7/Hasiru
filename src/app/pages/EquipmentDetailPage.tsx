@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router";
-import { MapPin, Star, Shield, Calendar, ArrowLeft, User, Loader2 } from "lucide-react";
+import { MapPin, Star, Shield, Calendar, ArrowLeft, User, Loader2, CheckCircle, X } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { Calendar as CalendarComponent } from "../components/ui/calendar";
 import { getAllEquipment } from "../utils/equipmentData";
@@ -11,6 +11,9 @@ export function EquipmentDetailPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [equipment, setEquipment] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [isBookingSuccess, setIsBookingSuccess] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -190,9 +193,20 @@ export function EquipmentDetailPage() {
                   </div>
                 </div>
 
-                <button className="w-full bg-primary text-primary-foreground py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity">
-                  Request Booking
-                </button>
+                {!isBookingSuccess ? (
+                  <button 
+                    onClick={() => setIsModalOpen(true)}
+                    className="w-full bg-primary text-primary-foreground py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity"
+                  >
+                    Request Booking
+                  </button>
+                ) : (
+                  <div className="bg-green-500/10 text-green-600 border border-green-500/20 rounded-xl p-4 text-center">
+                    <CheckCircle className="w-6 h-6 mx-auto mb-2" />
+                    <p className="font-semibold">Request Sent!</p>
+                    <p className="text-sm mt-1">Your booking request has reached {details.owner.name}.</p>
+                  </div>
+                )}
 
                 <div className="mt-4 pt-4 border-t border-border space-y-2">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -209,6 +223,110 @@ export function EquipmentDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Terms and Conditions Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-card w-full max-w-2xl rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-6 border-b border-border flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-foreground">Terms and Conditions</h2>
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="text-muted-foreground hover:bg-muted p-2 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto flex-1 space-y-4 text-sm text-muted-foreground">
+              <p>By proceeding with this booking, the user agrees to the following terms and conditions. Please read them carefully before confirming.</p>
+              
+              <div>
+                <strong className="text-foreground block mb-1">Accurate Information</strong>
+                The user must provide correct name, phone number, address, and location details while making the booking. Incorrect information may lead to cancellation of the booking.
+              </div>
+              
+              <div>
+                <strong className="text-foreground block mb-1">Booking Confirmation</strong>
+                A booking is considered confirmed only after the user completes the confirmation step and agrees to these terms and conditions.
+              </div>
+              
+              <div>
+                <strong className="text-foreground block mb-1">Usage Responsibility</strong>
+                The user is responsible for the proper use of the equipment / service provided. Any damage caused due to misuse or negligence will be the responsibility of the user.
+              </div>
+              
+              <div>
+                <strong className="text-foreground block mb-1">Return / Completion Policy</strong>
+                All rented equipment must be returned in the same condition as provided. Late return or damage may result in additional charges.
+              </div>
+              
+              <div>
+                <strong className="text-foreground block mb-1">Cancellation Policy</strong>
+                Once a booking is confirmed, cancellation may not be allowed or may require approval from the service provider.
+              </div>
+              
+              <div>
+                <strong className="text-foreground block mb-1">Availability</strong>
+                All bookings are subject to availability. The platform reserves the right to modify or cancel a booking if the requested item or service is not available.
+              </div>
+              
+              <div>
+                <strong className="text-foreground block mb-1">Liability Limitation</strong>
+                The platform acts only as a facilitator between the user and the service provider / CHC center. We are not responsible for any loss, damage, delay, or injury caused during the usage of the service.
+              </div>
+              
+              <div>
+                <strong className="text-foreground block mb-1">Location-Based Services</strong>
+                The system may use the user's location to suggest the nearest CHC / service center. The user must ensure the selected location is correct before confirming.
+              </div>
+              
+              <div>
+                <strong className="text-foreground block mb-1">Changes to Terms</strong>
+                These terms may be updated at any time without prior notice. Continued use of the platform means the user agrees to the latest terms.
+              </div>
+              
+              <div>
+                <strong className="text-foreground block mb-1">Agreement</strong>
+                By clicking "I Agree" or "Confirm Booking", the user confirms that they have read, understood, and accepted all the terms and conditions stated above.
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-border bg-muted/30">
+              <label className="flex items-start gap-3 cursor-pointer mb-6">
+                <input 
+                  type="checkbox" 
+                  checked={agreedToTerms}
+                  onChange={(e) => setAgreedToTerms(e.target.checked)}
+                  className="mt-1 w-5 h-5 rounded border-border text-primary focus:ring-primary"
+                />
+                <span className="text-sm font-medium text-foreground">
+                  I have read and agree to the Terms and Conditions
+                </span>
+              </label>
+              
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => setIsModalOpen(false)}
+                  className="flex-1 px-6 py-3 rounded-xl font-semibold border border-border text-foreground hover:bg-muted transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  disabled={!agreedToTerms}
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    setIsBookingSuccess(true);
+                  }}
+                  className="flex-1 px-6 py-3 rounded-xl font-semibold bg-primary text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
+                >
+                  Confirm Booking
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
