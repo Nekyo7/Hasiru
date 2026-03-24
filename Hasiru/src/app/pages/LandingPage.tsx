@@ -1,0 +1,190 @@
+import { useState, useEffect } from "react";
+import { Link } from "react-router";
+import { getSelectedCHC, hasCompletedSetup } from "../utils/auth";
+import { getAllEquipment, Equipment } from "../utils/equipmentData";
+import { Tractor, Wheat, Droplet, Sprout, Truck, ArrowRight, MapPin, Clock } from "lucide-react";
+import { ImageWithFallback } from "../components/figma/ImageWithFallback";
+import { useLanguage } from "../contexts/LanguageContext";
+
+export function LandingPage() {
+  const [featuredListings, setFeaturedListings] = useState<Equipment[]>([]);
+  const { t } = useLanguage();
+
+  const categories = [
+    {
+      icon: Tractor,
+      nameKey: "categories.tractors",
+      image: "https://images.unsplash.com/photo-1758636528604-a8b3d3824157?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZWQlMjB0cmFjdG9yJTIwd29ya2luZ3xlbnwxfHx8fDE3NzMzODkzMzh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      count: "240+"
+    },
+    {
+      icon: Wheat,
+      nameKey: "categories.harvesters",
+      image: "https://images.unsplash.com/photo-1742579373744-c9eb35987324?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb21iaW5lJTIwaGFydmVzdGVyJTIwZmllbGR8ZW58MXx8fHwxNzczMzg5MzM5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      count: "85+"
+    },
+    {
+      icon: Droplet,
+      nameKey: "categories.irrigation",
+      image: "https://images.unsplash.com/photo-1598370025936-0856434d26e7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpcnJpZ2F0aW9uJTIwc3lzdGVtJTIwZmFybXxlbnwxfHx8fDE3NzMzODkwNDV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      count: "120+"
+    },
+    {
+      icon: Sprout,
+      nameKey: "categories.seeders",
+      image: "https://images.unsplash.com/photo-1764277434161-23d72931335f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzZWVkaW5nJTIwZXF1aXBtZW50JTIwYWdyaWN1bHR1cmV8ZW58MXx8fHwxNzczMzg5MzM5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      count: "95+"
+    },
+    {
+      icon: Truck,
+      nameKey: "categories.transport",
+      image: "https://images.unsplash.com/photo-1760765622766-0338e7c65d4d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYXJtJTIwdHJhbnNwb3J0JTIwdHJ1Y2t8ZW58MXx8fHwxNzczMzg5MzQwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      count: "60+"
+    }
+  ];
+
+  useEffect(() => {
+    const selectedCHC = getSelectedCHC();
+    async function load() {
+      const all = await getAllEquipment(selectedCHC?.id);
+      setFeaturedListings(all.slice(0, 3));
+    }
+    load();
+  }, []);
+
+  return (
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <section className="relative h-[600px] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0">
+          <ImageWithFallback
+            src="https://images.unsplash.com/photo-1673200692829-fcdb7e267fc1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0cmFjdG9yJTIwZmFybWxhbmQlMjBsYW5kc2NhcGV8ZW58MXx8fHwxNzczMzg5MzM4fDA&ixlib=rb-4.1.0&q=80&w=1080"
+            alt="Farm landscape with tractors"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40" />
+        </div>
+
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
+            {t('hero.title')}<br />{t('hero.titleBr')}
+          </h1>
+          <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto">
+            {t('hero.subtitle')}
+          </p>
+          {!hasCompletedSetup() && (
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/signup"
+                className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-xl text-lg hover:scale-105 transition-transform shadow-lg"
+              >
+                <span>{t('hero.getStarted')}</span>
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+              <Link
+                to="/chc-centers"
+                className="inline-flex items-center justify-center gap-2 bg-secondary text-secondary-foreground px-8 py-4 rounded-xl text-lg hover:scale-105 transition-transform shadow-lg"
+              >
+                <span>{t('hero.browseChc')}</span>
+              </Link>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Categories Section */}
+      <section className="py-16 px-4 max-w-7xl mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold text-foreground mb-3">{t('categories.title')}</h2>
+          <p className="text-lg text-muted-foreground">{t('categories.subtitle')}</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {categories.map((category) => (
+            <Link
+              key={category.nameKey}
+              to={`/discover?q=${encodeURIComponent(t(category.nameKey))}`}
+              className="group relative overflow-hidden rounded-2xl bg-card shadow-md hover:shadow-xl transition-all hover:-translate-y-1"
+            >
+              <div className="aspect-[4/3] overflow-hidden">
+                <ImageWithFallback
+                  src={category.image}
+                  alt={t(category.nameKey)}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2">
+                    <category.icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-2xl font-semibold">{t(category.nameKey)}</h3>
+                </div>
+                <p className="text-white/90">{category.count}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Featured Listings */}
+      <section className="py-16 px-4 max-w-7xl mx-auto">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-4xl font-bold text-foreground mb-2">{t('featured.title')}</h2>
+            <p className="text-lg text-muted-foreground">{t('featured.subtitle')}</p>
+          </div>
+          <Link
+            to="/discover"
+            className="text-primary hover:text-primary/80 flex items-center gap-2"
+          >
+            {t('featured.viewAll')}
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {featuredListings.map((listing) => (
+            <Link
+              key={listing.id}
+              to={`/equipment/${listing.id}`}
+              className="group bg-card rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all hover:-translate-y-1"
+            >
+              <div className="aspect-[4/3] overflow-hidden relative">
+                <ImageWithFallback
+                  src={listing.image}
+                  alt={listing.name}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
+                {listing.available && (
+                  <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">
+                    {t('featured.available')}
+                  </div>
+                )}
+              </div>
+              <div className="p-5">
+                <h3 className="text-xl font-semibold text-foreground mb-3">{listing.name}</h3>
+                <div className="flex items-center gap-4 text-muted-foreground mb-3">
+                  <div className="flex items-center gap-1">
+                    <MapPin className="w-4 h-4" />
+                    <span className="text-sm">{listing.distance}</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-2xl font-bold text-foreground">{listing.price}</span>
+                    <span className="text-muted-foreground">{t('featured.hour')}</span>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-primary group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+
+    </div>
+  );
+}
