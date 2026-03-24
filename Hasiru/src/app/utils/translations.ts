@@ -12,7 +12,8 @@ export const translations = {
       login: "Login",
       profile: "Profile",
       loggedInAs: "Logged in as",
-      myProfile: "My Profile"
+      myProfile: "My Profile",
+      mapView: "Map View"
     },
     hero: {
       title: "Share Equipment.",
@@ -305,7 +306,8 @@ export const translations = {
       login: "ಲಾಗಿನ್",
       profile: "ಪ್ರೊಫೈಲ್",
       loggedInAs: "ಹೀಗೆ ಲಾಗ್ ಇನ್ ಆಗಿದ್ದೀರಿ",
-      myProfile: "ನನ್ನ ಪ್ರೊಫೈಲ್"
+      myProfile: "ನನ್ನ ಪ್ರೊಫೈಲ್",
+      mapView: "ನಕ್ಷೆ ವೀಕ್ಷಣೆ"
     },
     hero: {
       title: "ಉಪಕರಣಗಳನ್ನು ಹಂಚಿಕೊಳ್ಳಿ.",

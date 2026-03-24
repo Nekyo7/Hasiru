@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
-import { MapPin, Filter, Search, Tractor, ArrowLeft, Loader2, ArrowRight } from "lucide-react";
+import { MapPin, Filter, Search, Tractor, ArrowLeft, Loader2, ArrowRight, Map } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { getSelectedCHC } from "../utils/auth";
 import { getAllEquipment } from "../utils/equipmentData";
@@ -96,10 +96,17 @@ export function DiscoveryPage() {
                 className="w-full pl-12 pr-4 py-3 bg-input-background rounded-xl border-0 focus:ring-2 focus:ring-primary outline-none"
               />
             </div>
-            <button className="flex items-center gap-2 px-4 py-3 bg-input-background rounded-xl hover:bg-muted transition-colors">
+            <button className="flex items-center gap-2 px-4 py-3 bg-input-background rounded-xl hover:bg-muted transition-colors border border-border">
               <Filter className="w-5 h-5" />
               <span className="hidden sm:inline">{t('discovery.filters')}</span>
             </button>
+            <Link 
+              to="/map" 
+              className="flex items-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-xl hover:opacity-90 transition-opacity whitespace-nowrap"
+            >
+              <Map className="w-5 h-5" />
+              <span className="hidden sm:inline">{t('nav.mapView')}</span>
+            </Link>
           </div>
         </div>
       </div>

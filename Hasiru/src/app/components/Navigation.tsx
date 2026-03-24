@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router";
-import { Tractor, LayoutDashboard, Plus, Building2, BookOpen, User, LogOut, UserCircle, Globe } from "lucide-react";
+import { Tractor, LayoutDashboard, Plus, Building2, BookOpen, User, LogOut, UserCircle, Globe, Map } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { clearSetupSession } from "../utils/auth";
@@ -68,6 +68,13 @@ export function Navigation() {
                 className={`flex items-center gap-2 transition-colors ${currentHeaderTextColor} ${currentHeaderHoverColor}`}
               >
                 <span>{t('nav.findEquipment')}</span>
+              </Link>
+              <Link
+                to="/map"
+                className={`flex items-center gap-2 transition-colors ${currentHeaderTextColor} ${currentHeaderHoverColor}`}
+              >
+                <Map className="w-4 h-4" />
+                <span>{t('nav.mapView')}</span>
               </Link>
               <Link
                 to="/dashboard"
